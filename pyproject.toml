@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "iPod"
+version = "0.0.1"
+authors = []
+description = "Python library for talking to iPod nano devices"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "gpl-3.0"
+license-files = ["LICENSE"]
+
+[project.urls]
+Homepage = "https://github.com/760ceb3b9c0ba4872cadf3ce35a7a494/iPod"
+Issues = "https://github.com/760ceb3b9c0ba4872cadf3ce35a7a494/iPod/issues"

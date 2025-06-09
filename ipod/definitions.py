@@ -43,6 +43,38 @@ class iPodTarget:
 			((self.mode == device.mode) if self.mode else True)
 		)
 
+	def get_pretty_model_name(self) -> str:
+		for (name, target) in MODEL_NAME_TARGETS:
+			if target.is_compatible_with(self):
+				return name
+		raise ValueError("no pretty model name found")
+
+	def get_pretty_mode_name(self) -> str | None:
+		return MODE_NAMES[self.mode] if self.mode else None
+
+	def get_pretty_name(self) -> str:
+		name = self.get_pretty_model_name()
+		if self.mode:
+			return f"{name} in {self.get_pretty_mode_name()} mode"
+		else:
+			return name
+
+
+MODEL_NAME_TARGETS: list[tuple[str, iPodTarget]] = [
+	("iPod nano (3rd generation)", iPodTarget(iPodModel.NANO_3G)),
+	("iPod nano (4th generation)", iPodTarget(iPodModel.NANO_4G)),
+	("iPod nano (5th generation)", iPodTarget(iPodModel.NANO_5G)),
+	("iPod nano (6th generation)", iPodTarget(iPodModel.NANO_6G)),
+	("iPod nano (7th generation)", iPodTarget(iPodModel.NANO_7G, iPodSubvariant.NANO_7G_2012)),
+	("iPod nano (7th generation Mid 2015)", iPodTarget(iPodModel.NANO_7G, iPodSubvariant.NANO_7G_2015))
+]
+
+MODE_NAMES: dict[iPodMode, str] = {
+	iPodMode.DFU: "DFU",
+	iPodMode.WTF: "WTF",
+	iPodMode.DISK: "disk",
+}
+
 
 APPLE_VID = 0x05ac  # apple inc, http://www.linux-usb.org/usb.ids
 USB_PID_INDEX: dict[int, iPodTarget] = {

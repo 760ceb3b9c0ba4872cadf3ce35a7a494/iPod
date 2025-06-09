@@ -84,7 +84,6 @@ class iPodDeviceDiskMode(iPodDevice):
 
 		self._kernel_driver_detached = False
 		self.ms_host = self._initialize_host()
-		print(f"Created: {id(self)}")
 
 	def get_device_information_raw(self):
 		x = self.ms_host.inquiry_vital_product_data(0xc0, 0xfc)

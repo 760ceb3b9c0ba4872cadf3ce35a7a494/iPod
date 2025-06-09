@@ -138,7 +138,6 @@ class PayloadIPSWFile(_IPSWFile):
 	def get_manifest(self) -> PayloadIPSWManifest:
 		raw_data = self._zipfile.read("manifest.plist")
 		plist_data = plistlib.loads(raw_data)["FirmwarePayload"]
-		print(plist_data)
 		return PayloadIPSWManifest(
 			firmware_name=plist_data["FirmwareName"],
 			bootloader_name=plist_data["BootloaderName"],

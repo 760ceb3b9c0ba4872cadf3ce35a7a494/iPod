@@ -29,7 +29,7 @@ class OperationCode(IntEnum):
 	LOG_SENSE = 0x4d
 
 
-@dataclass(kw_only=True)
+@dataclass()
 class CommandDataBuffer:
 	operation_code: int
 

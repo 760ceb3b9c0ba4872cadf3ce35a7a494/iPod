@@ -117,16 +117,16 @@ class RecoveryIPSWFile(_IPSWFile):
 		return [USB_PID_INDEX[pid] for pid in self.get_target_device_usb_pids()]
 
 
-@dataclass(kw_only=True)
+@dataclass()
 class PayloadIPSWManifest:
 	firmware_name: str
 	bootloader_name: str
+	updater_family_id: int
+	family_id: int
 	build_id: Optional[int] = None
 	visible_build_id: Optional[int] = None
 	build_version: Optional[str] = None
 	product_version: Optional[str] = None
-	updater_family_id: int
-	family_id: int
 
 
 class PayloadIPSWFile(_IPSWFile):

@@ -59,7 +59,7 @@ def find_devices():
 	]
 
 
-@dataclass(kw_only=True)
+@dataclass()
 class iPodDevice:
 	target: iPodTarget
 	device: usb.core.Device
@@ -351,7 +351,7 @@ class iPodDeviceDiskMode(iPodDevice):
 		pass
 
 
-@dataclass(kw_only=True)
+@dataclass()
 class iPodFirmwareSendState:
 	block_number: int
 	block_count: int | None = None

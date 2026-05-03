@@ -3,6 +3,7 @@ definitions for iPod models and updater family IDs
 """
 
 from __future__ import annotations
+
 import dataclasses
 from enum import Enum
 from typing import Optional
@@ -21,6 +22,10 @@ class iPodMode(Enum):
 	DFU = "dfu"
 	WTF = "wtf"
 
+	@property
+	def pretty_name(self):
+		return MODE_NAMES[self]
+
 
 class iPodSubvariant(Enum):
 	NANO_7G_2012 = "nano_7g_2012"
@@ -37,10 +42,10 @@ class iPodTarget:
 	def is_compatible_with(self, device: iPodTarget):
 		"""check if this iPodTarget is compatible with another (assuming `self` is the target `device` is being checked against)"""
 		return (
-			(self.model == device.model) and
-			# None means any is ok :3
-			((self.subvariant == device.subvariant) if self.subvariant else True) and
-			((self.mode == device.mode) if self.mode else True)
+				(self.model == device.model) and
+				# None means any is ok :3
+				((self.subvariant == device.subvariant) if self.subvariant else True) and
+				((self.mode == device.mode) if self.mode else True)
 		)
 
 	def get_pretty_model_name(self) -> str:
@@ -49,13 +54,10 @@ class iPodTarget:
 				return name
 		raise ValueError("no pretty model name found")
 
-	def get_pretty_mode_name(self) -> str | None:
-		return MODE_NAMES[self.mode] if self.mode else None
-
 	def get_pretty_name(self) -> str:
 		name = self.get_pretty_model_name()
 		if self.mode:
-			return f"{name} in {self.get_pretty_mode_name()} mode"
+			return f"{name} in {self.mode.pretty_name} mode"
 		else:
 			return name
 
@@ -74,7 +76,6 @@ MODE_NAMES: dict[iPodMode, str] = {
 	iPodMode.WTF: "WTF",
 	iPodMode.DISK: "disk",
 }
-
 
 APPLE_VID = 0x05ac  # apple inc, http://www.linux-usb.org/usb.ids
 USB_PID_INDEX: dict[int, iPodTarget] = {

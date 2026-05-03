@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import datetime
 from dataclasses import dataclass
 
 _YEAR_ALPHABET = "CDFGHJKLMNPQRSTVWXYZ"
@@ -20,10 +22,8 @@ class SerialNumber:
 
 	@classmethod
 	def from_serial(cls, serial: str) -> SerialNumber:
-		try:
-			if len(serial) != 12:
-				raise ValueError()
-
+		if len(serial) == 12:
+			# 2010- serial format
 			half_year = _YEAR_ALPHABET.index(serial[3])
 
 			base_year = half_year // 2
@@ -31,11 +31,15 @@ class SerialNumber:
 
 			year = 2010 + base_year
 			week = (
-				(1 + _WEEK_ALPHABET.index(serial[4]))
-				+ (26 if is_second_half else 0)
+					(1 + _WEEK_ALPHABET.index(serial[4]))
+					+ (26 if is_second_half else 0)
 			)
-		except ValueError:
-			raise InvalidSerialNumber(f"invalid serial number {serial!r}") from None
+		elif len(serial) == 11:
+			# 2000s serial format
+			year = 2000 + int(serial[2])
+			week = int(serial[3:5])
+		else:
+			raise ValueError("invalid serial number")
 
 		return cls(
 			location_code=serial[:3],
@@ -46,6 +50,7 @@ class SerialNumber:
 		)
 
 	def to_serial(self):
+		# fixme: always creates 2010 serials
 		base_year = (self.manufacturing_year - 2010)
 		half_year = base_year * 2
 
@@ -62,3 +67,9 @@ class SerialNumber:
 	def __repr__(self):
 		return f"<SerialNumber manufacturing_year={self.manufacturing_year} manufacturing_week={self.manufacturing_week} {self.to_serial()}>"
 
+
+def calculate_week_start_and_end_dates(year: int, week: int):
+	"""Utility to turn a week and year to the monday and sunday dates of that week"""
+	monday_date = datetime.datetime.strptime(f"{year}-W{week}-1", "%Y-W%W-%w")
+	friday_date = monday_date + datetime.timedelta(days=6)
+	return monday_date, friday_date

@@ -6,63 +6,26 @@ from __future__ import annotations
 
 import io
 import math
-import plistlib
-import subprocess
-import sys
+import platform
+import zlib
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import BinaryIO, Callable, Optional
+from typing import BinaryIO, Callable, Optional, Iterable
 
 import usb.core
 
-from .definitions import iPodMode, USB_PID_INDEX, iPodTarget
+from .definitions import iPodTarget, iPodMode, iPodModel
 from .dfu import DFUDevice, DFUDeviceState
+from .platforms.base import BaseSCSIDevice, BaseUSBProvider, ConnectedDevice
+from .plist import iPodPlistParser
 from .scsi import CommandDataBuffer, iPodSubcommand, DataTransferDirection
-from .usb_mass_storage import HostDevice
 from .utils import buffered
-
-
-def find_raw_devices() -> list[tuple[iPodTarget, usb.core.Device]]:
-	return [
-		(USB_PID_INDEX[device.idProduct], device)
-		for device in usb.core.find(find_all=True, idVendor=0x05ac)
-		if device.idProduct in USB_PID_INDEX
-	]
-
-
-def device_from_raw_device(raw_device: tuple[iPodTarget, usb.core.Device]) -> iPodDeviceDiskMode | iPodDeviceWTF | iPodDeviceDFU:
-	(target, device) = raw_device
-
-	return (
-		iPodDeviceDiskMode(
-			target=target,
-			device=device
-		) if target.mode == iPodMode.DISK else
-
-		iPodDeviceWTF(
-			target=target,
-			device=device
-		) if target.mode == iPodMode.WTF else
-
-		iPodDeviceDFU(
-			target=target,
-			device=device
-		) if target.mode == iPodMode.DFU else
-		None
-	)
-
-
-def find_devices():
-	return [
-		device_from_raw_device(raw_device) for raw_device in find_raw_devices()
-	]
 
 
 @dataclass()
 class iPodDevice:
 	target: iPodTarget
-	device: usb.core.Device
 
 
 class iPodUpdateKind(Enum):
@@ -70,26 +33,76 @@ class iPodUpdateKind(Enum):
 	FIRMWARE = "firmware"
 
 
+class iPodProvider:
+	_usb_provider: BaseUSBProvider
+
+	def __enter__(self):
+		return self
+
+	def __init__(
+			self,
+			usb_provider: BaseUSBProvider | None = None
+	):
+		if usb_provider is None:
+			system = platform.system()
+			if system == "Windows":
+				# windows provider
+				from .platforms.win32_provider import Win32USBProvider
+				usb_provider = Win32USBProvider()
+			elif system == "Linux":
+				# linux provider
+				from .platforms.sgutils_provider import SGUtilsUSBProvider
+				usb_provider = SGUtilsUSBProvider()
+			else:
+				# pyusb provider (kinda the fallback)
+				from .platforms.pyusb_provider import PyUSBProvider
+				usb_provider = PyUSBProvider()
+
+		self._usb_provider = usb_provider
+
+	def list_devices(self) -> Iterable[ConnectedDevice]:
+		return self._usb_provider.list_connected_devices()
+
+	def get_device(self, device: str | ConnectedDevice):
+		if isinstance(device, str):
+			connected_device = self._usb_provider.get_connected_device(device)
+			if not connected_device:
+				return None
+		else:
+			connected_device = device
+
+		return self._get_device(connected_device)
+
+	def _get_device(self, raw_device: ConnectedDevice) -> iPodDeviceDFU | iPodDeviceDiskMode | None:
+		if raw_device.target.mode in {iPodMode.DFU, iPodMode.WTF}:
+			return iPodDeviceDFU(
+				target=raw_device.target,
+				dfu_host=self._usb_provider.get_dfu_device(raw_device.id)
+			)
+		elif raw_device.target.mode == iPodMode.DISK:
+			return iPodDeviceDiskMode(
+				target=raw_device.target,
+				device=self._usb_provider.get_scsi_device(raw_device.id)
+			)
+
+		return None
+
+
 class iPodDeviceDiskMode(iPodDevice):
 	def __init__(
 			self,
 			*,
 			target: iPodTarget,
-			device: usb.core.Device
+			device: BaseSCSIDevice
 	):
-		super().__init__(
-			target=target,
-			device=device
-		)
-
-		self._kernel_driver_detached = False
-		self.ms_host = self._initialize_host()
+		super().__init__(target=target)
+		self._device = device
 
 	def get_device_information_raw(self):
-		x = self.ms_host.inquiry_vital_product_data(0xc0, 0xfc)
+		self._device.inquiry_vital_product_data(0xc0, 0xfc)
 		stream = io.BytesIO()
 		for page in range(0xc2, 0xff):
-			data = self.ms_host.inquiry_vital_product_data(page, 0xfc)
+			data = self._device.inquiry_vital_product_data(page, 0xfc)
 			stream.write(data)
 			if len(data) < 0xfc - 4:
 				break
@@ -97,24 +110,35 @@ class iPodDeviceDiskMode(iPodDevice):
 		return stream.read()
 
 	def test(self):
-		self.ms_host.inquiry_vital_product_data(0x0, 0x10)
+		self._device.inquiry_vital_product_data(0x0, 0x10)
 
 	def get_device_information(self):
 		data = self.get_device_information_raw()
-		decoded_data = plistlib.loads(data)
+		decoded_data = iPodPlistParser(dict_type=dict).parse(io.BytesIO(data))
 		return decoded_data
 
-	def reboot(self):
-		self.device.reset()
-		usb.util.dispose_resources(self.device)
-		# self.ms_host.raw_command(CommandDataBuffer(
-		# 	operation_code=0x1b,  # "START STOP UNIT"
-		# 	request=bytes([0, 0, 0, 0b00000010])  # i think the "LOEJ" bit was set
-		# ))
+	def eject(self):
+		"""
+		Tell the iPod that it is "OK to Disconnect". Also reboots an iPod after an update.
+		"""
+		# thank you so, so, so, so much. https://ramblings.narrabilis.com/ejecting-ipod-under-linux
+		self._device.raw_command(CommandDataBuffer(
+			operation_code=0x1E,  # "PREVENT ALLOW MEDIUM REMOVAL"
+			request=bytes([0, 0, 0, 0])
+		))
+		self._device.raw_command(CommandDataBuffer(
+			operation_code=0x1b,  # "START STOP UNIT"
+			request=bytes([
+				0b0000_0001,  # IMMED = 1
+				0b0000_0000,
+				0b0000_0000,
+				0b0000_0010  # LOEJ = 1
+			])
+		))
 
 	def get_capacity(self) -> tuple[int, int]:
 		# returns: block count, block size
-		data = self.ms_host.raw_command(CommandDataBuffer(
+		data = self._device.raw_command(CommandDataBuffer(
 			operation_code=0x25,
 			request=bytes(8),
 			incoming_data_length=8,
@@ -135,13 +159,13 @@ class iPodDeviceDiskMode(iPodDevice):
 		]))
 		stream.write(int.to_bytes(length, 4, "big"))
 		stream.seek(0)
-		self.ms_host.raw_command(CommandDataBuffer(
+		self._device.raw_command(CommandDataBuffer(
 			operation_code=0xc6,
 			request=stream.read(),
 		))
 
 	def _update_end(self):
-		self.ms_host.raw_command(CommandDataBuffer(
+		self._device.raw_command(CommandDataBuffer(
 			operation_code=0xc6,
 			request=bytes([iPodSubcommand.UPDATE_END])
 		))
@@ -153,7 +177,7 @@ class iPodDeviceDiskMode(iPodDevice):
 		stream.write(bytes([iPodSubcommand.REPARTITION]))
 		stream.write(int.to_bytes(size, 4, "big"))
 		stream.seek(0)
-		self.ms_host.raw_command(CommandDataBuffer(
+		self._device.raw_command(CommandDataBuffer(
 			operation_code=0xc6,
 			request=stream.read(),
 		))
@@ -173,7 +197,7 @@ class iPodDeviceDiskMode(iPodDevice):
 		request_stream.write(int.to_bytes(sector_count, 2, "big"))  # "nsectors"
 		request_stream.seek(0)
 
-		self.ms_host.raw_command(CommandDataBuffer(
+		self._device.raw_command(CommandDataBuffer(
 			operation_code=0xc6,
 			request=request_stream.read(),
 			outgoing_data=content,
@@ -181,7 +205,7 @@ class iPodDeviceDiskMode(iPodDevice):
 		))
 
 	def finalize_updates(self):
-		self.ms_host.raw_command(CommandDataBuffer(
+		self._device.raw_command(CommandDataBuffer(
 			operation_code=0xc6,
 			request=bytes([iPodSubcommand.UPDATE_FINALIZE])  # i think the "LOEJ" bit was set
 		))
@@ -191,10 +215,10 @@ class iPodDeviceDiskMode(iPodDevice):
 			kind: iPodUpdateKind,
 			stream: BinaryIO,
 			length: int,
+			block_size: int = 0x8000,
 			on_progress: Optional[Callable[[iPodFirmwareSendState], None]] = None
 	):
 		self._update_start(kind, length)
-		block_size = 0x1000 * 8
 		block_count = math.ceil(length / block_size)
 		for block_number in range(block_count):
 			self._update_send_block(stream, block_size)
@@ -212,150 +236,23 @@ class iPodDeviceDiskMode(iPodDevice):
 
 		self._update_end()  # this can take some time
 
-	def _initialize_host(self):
-		configuration: usb.core.Configuration = self.device.get_active_configuration()
-
-		# Find the mass storage interface
-		self.mass_storage_interface: usb.core.Interface | None = None
-		for interface in configuration.interfaces():
-			if interface.bInterfaceClass == 0x08:
-				# https://www.usb.org/defined-class-codes#anchor_BaseClass08h 8 = mass storage
-				self.mass_storage_interface = interface
-				break
-
-		if not self.mass_storage_interface:
-			raise Exception("cant find mass storage interface...")
-
-		# find the endpoints
-		in_endpoint: usb.core.Endpoint | None = None
-		out_endpoint: usb.core.Endpoint | None = None
-		for endpoint in self.mass_storage_interface.endpoints():
-			endpoint_direction = usb.util.endpoint_direction(endpoint.bEndpointAddress)
-			if endpoint_direction == usb.util.ENDPOINT_IN:
-				in_endpoint = endpoint
-			elif endpoint_direction == usb.util.ENDPOINT_OUT:
-				out_endpoint = endpoint
-
-		if not (in_endpoint and out_endpoint):
-			raise Exception("cant find endpoints..")
-
-		return HostDevice(
-			in_endpoint=in_endpoint,
-			out_endpoint=out_endpoint,
-			tag=0x0  # its not important
-		)
-
 	def get_mount_point(self) -> Path | None:
-		if not self.is_kernel_driver_active():
-			# cant be mounted if kernel driver isnt active.
-			return None
+		return self._device.get_mount_point()
 
-		if sys.platform == "darwin":
-			process = subprocess.run(
-				args=[
-					"/usr/sbin/system_profiler",
-					"-nospawn", "-xml",
-					"SPUSBDataType",
-					"-detailLevel", "full"
-				],
-				stdout=subprocess.PIPE
-			)
-			process.check_returncode()
-			plist_data = process.stdout
-			data = plistlib.loads(plist_data)[0]
-
-			def find_device_data_within(data: dict) -> dict | None:
-				# data has a key _items containing a list of either items or other dicts with the key _items.
-				for sub_data in data["_items"]:
-					if "_items" in sub_data:
-						found_data = find_device_data_within(sub_data)
-						if found_data:
-							return found_data
-					elif "serial_num" in sub_data:
-						# the libusb address and macOS location id seem to differ after the device is reattached.
-						# so i went with checking s/n instead.
-						# Looking into it
-
-						# this is a device and not a hub/controller so compare the location_id
-						# location_id = sub_data["location_id"]
-						# libusb_address = int(location_id.split("/")[1].strip())
-						# if libusb_address == self.device.address:
-						# 	# YAY WE FOUND IT ^w^
-						# 	return sub_data
-
-						if self.device.serial_number == sub_data["serial_num"]:
-							# YAY WE FOUND IT ^w^
-							return sub_data
-
-				return None
-
-			# recursively find the device
-			this_device_data = find_device_data_within(data)
-			if this_device_data is None:
-				# noo .. we didnt find it ... T_T
-				return
-
-			media_data = this_device_data.get("Media")
-			if media_data is None:
-				# this device is attached but not mounted rn.
-				return None
-
-			for volume in media_data[0]["volumes"]:
-				if "mount_point" in volume:
-					return volume["mount_point"]
-		else:
-			raise NotImplementedError(f"not implemented on {sys.platform=}")
-
-	def is_kernel_driver_active(self) -> bool:
-		"""true if the kernel is attached to this device, like if its mounted as a mass storage device."""
-		is_active = self.device.is_kernel_driver_active(self.mass_storage_interface.index)
-		# print(f"{is_active=}")
-		return is_active
+	def is_kernel_driver_active(self):
+		return self._device.is_kernel_driver_active()
 
 	def detach_kernel_driver(self):
-		"""forcefully detach the kernel driver for this device. ejecting it first is kinder to it."""
-		# print("detached kernel driver")
-		# print(f"{self.is_kernel_driver_active()=}")
-		usb.util.dispose_resources(self.device)
-		# print(f"{self.is_kernel_driver_active()=}")
-		self.device.detach_kernel_driver(self.mass_storage_interface.index)
-		# print(f"{self.is_kernel_driver_active()=}")
+		return self._device.detach_kernel_driver()
 
 	def attach_kernel_driver(self):
-		"""give the device back to the kernel . which will probably remount it."""
-		# print("attached kernel driver")
-		# print(f"{self.is_kernel_driver_active()=}")
-		usb.util.release_interface(self.device, self.mass_storage_interface.index)
-		# print(f"{self.is_kernel_driver_active()=}")
-		self.device.attach_kernel_driver(self.mass_storage_interface.index)
-		# print(f"{self.is_kernel_driver_active()=}")
-
-	def __del__(self):
-		# usb.util.dispose_resources(self.device)  # this is magic it makes it all work idk how but it does :3
-		# print(f"Deleted: {id(self)}")
-		pass
-
-	def __enter__(self):
-		# print("__enter__")
-		# if self.is_kernel_driver_active():
-		# 	self._kernel_driver_detached = True
-		# self.detach_kernel_driver()
-		pass
-
-	def __exit__(self, exc_type, exc_val, exc_tb):
-		# print("__exit__")
-		# if self._kernel_driver_detached:
-		# 	self.attach_kernel_driver()
-
-		usb.util.dispose_resources(self.device)  # https://github.com/square/pyfu-usb/blob/master/pyfu_usb/dfu.py#L135
-		pass
+		return self._device.attach_kernel_driver()
 
 
 @dataclass()
 class iPodFirmwareSendState:
 	block_number: int
 	block_count: int | None = None
-	# percentage: float | None = None
 
 
 class iPodDeviceDFU(iPodDevice):
@@ -363,17 +260,11 @@ class iPodDeviceDFU(iPodDevice):
 			self,
 			*,
 			target: iPodTarget,
-			device: usb.core.Device
+			dfu_host: DFUDevice
 	):
-		super().__init__(
-			target=target,
-			device=device
-		)
+		super().__init__(target=target)
 
-		self.dfu_host = DFUDevice(
-			device=device,
-			interface=0
-		)
+		self.dfu_host = dfu_host
 
 	def is_ready_for_firmware_block(self) -> bool:
 		status = self.dfu_host.get_status()
@@ -386,9 +277,9 @@ class iPodDeviceDFU(iPodDevice):
 		return False
 
 	def send_firmware_block(
-		self,
-		block_number: int,
-		block: bytes
+			self,
+			block_number: int,
+			block: bytes
 	):
 		self.dfu_host.download(
 			block_number=block_number,
@@ -420,12 +311,32 @@ class iPodDeviceDFU(iPodDevice):
 		return False
 
 	def send_firmware(
-		self,
-		stream: io.BytesIO,
-		length: int,
-		block_size: int = 0x800,
-		on_progress: Optional[Callable[[iPodFirmwareSendState], None]] = None
+			self,
+			stream: BinaryIO,
+			length: int,
+			block_size: int = 0x800,
+			on_progress: Optional[Callable[[iPodFirmwareSendState], None]] = None
 	):
+		include_checksum = self.target.model == iPodModel.NANO_3G  # nano 3g requires a checksum
+		start_offset = stream.tell()
+
+		if include_checksum:
+			# TODO: maybe do this without allocating a new buffer. idk. does it matter. computers are fast now
+			new_stream = io.BytesIO()
+			crc_value = 0  # a tool that will help us later :3
+			for block in buffered(stream, buffer_size=0x10000, limit=length):
+				new_stream.write(block)
+				crc_value = zlib.crc32(block, crc_value)
+
+			crc = int.to_bytes(crc_value, 4, "little")
+			new_stream.write(bytes([byte ^ 0xFF for byte in crc]))  # sneaky you itunes :3
+
+			stream.seek(start_offset)  # goodbye old one
+
+			length = new_stream.tell()
+			new_stream.seek(0)
+			stream = new_stream
+
 		block_number = 0
 		block_count = math.ceil(length / block_size) if length else None
 
@@ -458,8 +369,7 @@ class iPodDeviceDFU(iPodDevice):
 			if on_progress:
 				on_progress(iPodFirmwareSendState(
 					block_number=block_number,
-					block_count=block_count,
-					# percentage=(block_number / block_count) if block_count else None
+					block_count=block_count
 				))
 
 			# increment the block number
@@ -474,20 +384,9 @@ class iPodDeviceDFU(iPodDevice):
 		if on_progress:
 			on_progress(iPodFirmwareSendState(
 				block_number=block_number,
-				block_count=block_count,
-				# percentage=1.0  # all done!
+				block_count=block_count
 			))
 
 		while True:
 			if self.is_firmware_upload_complete():
 				break
-
-	def __enter__(self):
-		self.dfu_host.__enter__()
-
-	def __exit__(self, exc_type, exc_val, exc_tb):
-		self.dfu_host.__exit__(exc_type, exc_val, exc_tb)
-
-
-class iPodDeviceWTF(iPodDeviceDFU):
-	...

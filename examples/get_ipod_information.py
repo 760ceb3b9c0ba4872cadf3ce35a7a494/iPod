@@ -2,15 +2,17 @@
 # on macOS try running this in a normal terminal window if you are having an issue
 
 import json
-from ipod.device import find_devices, iPodDeviceDiskMode
 
-devices = find_devices()
-for device in devices:
-	if not isinstance(device, iPodDeviceDiskMode):
-		continue
+from ipod.definitions import iPodMode
+from ipod.device import iPodProvider, iPodDeviceDiskMode
 
-	device.detach_kernel_driver()
-	print(device.target.get_pretty_name())
-	data = device.get_device_information()
-	print(json.dumps(data, indent=2))
-	break
+provider = iPodProvider()
+for connected_device in provider.list_devices():
+	if connected_device.target.mode == iPodMode.DISK:
+		device: iPodDeviceDiskMode = provider.get_device(connected_device)
+
+		device.detach_kernel_driver()  # Required on macOS
+		print(device.target.get_pretty_name())
+		data = device.get_device_information()
+		print(json.dumps(data, indent=2))
+		break

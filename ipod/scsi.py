@@ -1,5 +1,6 @@
 """
-implementation of a subset of the USB SCSI protocol with Apple iPodSubcommand extensions
+implementation of a subset of SCSI CDB with Apple iPodSubcommand extensions
+Actual sending is platform-specific, see platforms
 """
 
 import io
@@ -55,7 +56,8 @@ class CommandDataBuffer:
 			if self.service_action is not None:
 				raise Exception("ServiceAction field not available in CDB6")
 			if len(self.request) != 4:
-				raise Exception(f"CDB6 request size is {len(self.request)} bytes, needs to be 4 bytes without LengthField")
+				raise Exception(
+					f"CDB6 request size is {len(self.request)} bytes, needs to be 4 bytes without LengthField")
 
 			buffer = io.BytesIO(bytes(6))
 			buffer.write(bytes([self.operation_code]))
@@ -122,7 +124,6 @@ class CommandDataBuffer:
 			buffer.seek(0)
 			return buffer.read()
 		elif self.operation_code == 0xc6:
-			limit = 5  # idk why 5 but thats what wInd3x does so
 			subcommand = self.request[0]
 			if subcommand in {
 				iPodSubcommand.UPDATE_START,
@@ -139,10 +140,26 @@ class CommandDataBuffer:
 			if len(self.request) > limit:
 				raise Exception("request too long")
 
-			buffer = io.BytesIO(bytes(limit+1))
+			buffer = io.BytesIO(bytes(limit + 1))
 			buffer.write(bytes([self.operation_code]))
 			buffer.write(self.request)  # this effectively pads the end with \x00
 			buffer.seek(0)
 			return buffer.read()
 
 		raise ValueError(f"unhandled opcode {self.operation_code}")
+
+
+def create_inquiry_vital_product_data(page_code: int, allocation_length: int) -> CommandDataBuffer:
+	buffer = io.BytesIO()
+	# "When the EVPD bit is set to one, the PAGE CODE field specifies which page of vital product data information the device server shall return"
+	buffer.write(0b00000001.to_bytes(1, "big"))
+	buffer.write(page_code.to_bytes(1, "big"))
+	buffer.write(allocation_length.to_bytes(2, "big"))
+	buffer.seek(0)
+
+	return CommandDataBuffer(
+		operation_code=OperationCode.INQUIRY,
+		request=buffer.read(),
+		data_transfer_direction=DataTransferDirection.FROM_DEVICE,
+		incoming_data_length=allocation_length
+	)

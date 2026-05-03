@@ -126,11 +126,3 @@ class DFUDevice:
 
 	def release_interface(self):
 		usb.util.release_interface(self.device, self.interface)
-
-	def __enter__(self):
-		pass
-		# self.claim_interface()
-
-	def __exit__(self, exc_type, exc_val, exc_tb):
-		pass
-		# self.release_interface()

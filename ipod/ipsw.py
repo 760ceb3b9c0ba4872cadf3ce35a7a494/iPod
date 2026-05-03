@@ -4,6 +4,7 @@ only iPod-compatible firmware is supported, which is a small subset of IPSW file
 """
 
 import plistlib
+import typing
 from dataclasses import dataclass
 from enum import Enum
 from os import PathLike
@@ -11,7 +12,7 @@ from pathlib import PurePosixPath
 from typing import BinaryIO, IO, Optional
 from zipfile import ZipFile
 
-from ipod.definitions import iPodTarget, USB_PID_INDEX
+from ipod.definitions import iPodTarget, USB_PID_INDEX, UPDATER_FAMILY_ID_INDEX
 
 
 class IPSWKind(Enum):
@@ -98,6 +99,12 @@ class RecoveryIPSWFile(_IPSWFile):
 	def get_img1_data(self) -> bytes:
 		return self._zipfile.read(self._get_img1_file_path())
 
+	def get_img1_length(self) -> int:
+		return self._zipfile.getinfo(self._get_img1_file_path()).file_size
+
+	def open_img1_file(self) -> typing.IO[bytes]:
+		return self._zipfile.open(self._get_img1_file_path())
+
 	def get_manifest(self) -> RecoveryIPSWManifest:
 		raw_data = self._zipfile.read("Restore.plist")
 		plist_data = plistlib.loads(raw_data)
@@ -116,6 +123,12 @@ class RecoveryIPSWFile(_IPSWFile):
 	def get_target_devices(self) -> list[iPodTarget]:
 		return [USB_PID_INDEX[pid] for pid in self.get_target_device_usb_pids()]
 
+	def is_compatible_with(self, target: iPodTarget):
+		for our_target in self.get_target_devices():
+			if our_target.is_compatible_with(target):
+				return True
+		return False
+
 
 @dataclass()
 class PayloadIPSWManifest:
@@ -127,6 +140,12 @@ class PayloadIPSWManifest:
 	visible_build_id: Optional[int] = None
 	build_version: Optional[str] = None
 	product_version: Optional[str] = None
+
+	def get_target_device(self):
+		return UPDATER_FAMILY_ID_INDEX[self.updater_family_id]
+
+	def is_compatible_with(self, target: iPodTarget):
+		return self.get_target_device().is_compatible_with(target)
 
 
 class PayloadIPSWFile(_IPSWFile):
@@ -140,7 +159,7 @@ class PayloadIPSWFile(_IPSWFile):
 		plist_data = plistlib.loads(raw_data)["FirmwarePayload"]
 		return PayloadIPSWManifest(
 			firmware_name=plist_data["FirmwareName"],
-			bootloader_name=plist_data["BootloaderName"],
+			bootloader_name=plist_data.get("BootloaderName"),
 
 			# older fw
 			build_id=plist_data.get("BuildID"),
@@ -154,20 +173,30 @@ class PayloadIPSWFile(_IPSWFile):
 			family_id=plist_data["FamilyID"]
 		)
 
-	# @contextmanager
 	def open_bootloader_img1_file(self) -> IO[bytes]:
-		manifest = self.get_manifest()
-		return self._zipfile.open(manifest.bootloader_name, "r")
-		# yield stream
+		bootloader_name = self.get_manifest().bootloader_name
+		if not bootloader_name:
+			raise ValueError("no bootloader in this IPSW")
+		return self._zipfile.open(bootloader_name, "r")
 
-	def get_bootloader_img1_data(self) -> bytes:
-		return self._zipfile.read(self.get_manifest().bootloader_name)
+	def get_bootloader_img1_data(self) -> bytes | None:
+		bootloader_name = self.get_manifest().bootloader_name
+		if not bootloader_name:
+			return None
+		return self._zipfile.read(bootloader_name)
 
-	# @contextmanager
+	def get_bootloader_img1_length(self) -> int:
+		bootloader_name = self.get_manifest().bootloader_name
+		if not bootloader_name:
+			raise ValueError("no bootloader in this IPSW")
+		return self._zipfile.getinfo(self.get_manifest().bootloader_name).file_size
+
 	def open_firmware_mse_file(self) -> IO[bytes]:
 		manifest = self.get_manifest()
 		return self._zipfile.open(manifest.firmware_name, "r")
-		# yield stream
 
 	def get_firmware_mse_data(self) -> bytes:
 		return self._zipfile.read(self.get_manifest().firmware_name)
+
+	def get_firmware_mse_length(self) -> int:
+		return self._zipfile.getinfo(self.get_manifest().firmware_name).file_size

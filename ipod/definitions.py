@@ -67,8 +67,8 @@ MODEL_NAME_TARGETS: list[tuple[str, iPodTarget]] = [
 	("iPod nano (4th generation)", iPodTarget(iPodModel.NANO_4G)),
 	("iPod nano (5th generation)", iPodTarget(iPodModel.NANO_5G)),
 	("iPod nano (6th generation)", iPodTarget(iPodModel.NANO_6G)),
-	("iPod nano (7th generation)", iPodTarget(iPodModel.NANO_7G, iPodSubvariant.NANO_7G_2012)),
-	("iPod nano (7th generation Mid 2015)", iPodTarget(iPodModel.NANO_7G, iPodSubvariant.NANO_7G_2015))
+	("iPod nano (7th generation Mid 2015)", iPodTarget(iPodModel.NANO_7G, iPodSubvariant.NANO_7G_2015)),
+	("iPod nano (7th generation)", iPodTarget(iPodModel.NANO_7G))
 ]
 
 MODE_NAMES: dict[iPodMode, str] = {

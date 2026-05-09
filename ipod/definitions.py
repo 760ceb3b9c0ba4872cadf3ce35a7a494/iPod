@@ -15,6 +15,7 @@ class iPodModel(Enum):
 	NANO_5G = "nano_5g"
 	NANO_6G = "nano_6g"
 	NANO_7G = "nano_7g"
+	CLASSIC_6G = "classic_6g"  # or 6.5g/7g/7.5g, see https://freemyipod.org/wiki/Classic_6G
 
 
 class iPodMode(Enum):
@@ -30,6 +31,10 @@ class iPodMode(Enum):
 class iPodSubvariant(Enum):
 	NANO_7G_2012 = "nano_7g_2012"
 	NANO_7G_2015 = "nano_7g_2015"
+	CLASSIC_6G_INITIAL = "classic_6g_initial"
+	CLASSIC_6G_REV_A = "classic_6g_rev_A"
+	CLASSIC_6G_REV_B = "classic_6g_rev_B"
+	CLASSIC_6G_REV_C = "classic_6g_rev_C"
 
 
 @dataclasses.dataclass
@@ -68,7 +73,12 @@ MODEL_NAME_TARGETS: list[tuple[str, iPodTarget]] = [
 	("iPod nano (5th generation)", iPodTarget(iPodModel.NANO_5G)),
 	("iPod nano (6th generation)", iPodTarget(iPodModel.NANO_6G)),
 	("iPod nano (7th generation Mid 2015)", iPodTarget(iPodModel.NANO_7G, iPodSubvariant.NANO_7G_2015)),
-	("iPod nano (7th generation)", iPodTarget(iPodModel.NANO_7G))
+	("iPod nano (7th generation)", iPodTarget(iPodModel.NANO_7G)),
+
+	("iPod classic (6th generation Rev A)", iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_A)),
+	("iPod classic (6th generation Rev B)", iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_B)),
+	("iPod classic (6th generation Rev C)", iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_C)),
+	("iPod classic (6th generation)", iPodTarget(iPodModel.CLASSIC_6G))
 ]
 
 MODE_NAMES: dict[iPodMode, str] = {
@@ -81,12 +91,8 @@ APPLE_VID = 0x05ac  # apple inc, http://www.linux-usb.org/usb.ids
 USB_PID_INDEX: dict[int, iPodTarget] = {
 	# https://freemyipod.org/wiki/Modes
 
-	# 0x1260: (iPodModel.NANO_2G, iPodMode.normal),
-	# 0x1220: (iPodModel.NANO_2G, iPodMode.dfu),
-	# 0x1240: (iPodModel.NANO_2G, iPodMode.wtf),
-
 	0x1262: iPodTarget(iPodModel.NANO_3G, None, iPodMode.DISK),
-	0x1223: iPodTarget(iPodModel.NANO_3G, None, iPodMode.DFU),
+	# 0x1223: iPodTarget(iPodModel.NANO_3G, None, iPodMode.DFU),
 	0x1224: iPodTarget(iPodModel.NANO_3G, None, iPodMode.DFU),
 	0x1242: iPodTarget(iPodModel.NANO_3G, None, iPodMode.WTF),
 
@@ -106,6 +112,13 @@ USB_PID_INDEX: dict[int, iPodTarget] = {
 	0x1234: iPodTarget(iPodModel.NANO_7G, None, iPodMode.DFU),
 	0x1249: iPodTarget(iPodModel.NANO_7G, iPodSubvariant.NANO_7G_2012, iPodMode.WTF),
 	0x124A: iPodTarget(iPodModel.NANO_7G, iPodSubvariant.NANO_7G_2015, iPodMode.WTF),
+
+	0x1261: iPodTarget(iPodModel.CLASSIC_6G, None, iPodMode.DISK),
+	0x1223: iPodTarget(iPodModel.CLASSIC_6G, None, iPodMode.DFU),
+	0x1241: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_INITIAL, iPodMode.WTF),
+	0x1245: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_A, iPodMode.WTF),
+	0x1247: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_B, iPodMode.WTF),
+	0x1250: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_C, iPodMode.WTF),
 }
 
 UPDATER_FAMILY_ID_INDEX: dict[int, iPodTarget] = {
@@ -115,5 +128,10 @@ UPDATER_FAMILY_ID_INDEX: dict[int, iPodTarget] = {
 	34: iPodTarget(iPodModel.NANO_5G),
 	36: iPodTarget(iPodModel.NANO_6G),
 	37: iPodTarget(iPodModel.NANO_7G, iPodSubvariant.NANO_7G_2012),
-	39: iPodTarget(iPodModel.NANO_7G, iPodSubvariant.NANO_7G_2015)
+	39: iPodTarget(iPodModel.NANO_7G, iPodSubvariant.NANO_7G_2015),
+
+	24: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_INITIAL),
+	33: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_A),
+	35: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_B),
+	38: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_C),  # guessing for this one.
 }

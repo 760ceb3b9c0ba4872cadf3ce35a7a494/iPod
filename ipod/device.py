@@ -117,6 +117,16 @@ class iPodDeviceDiskMode(iPodDevice):
 		decoded_data = iPodPlistParser(dict_type=dict).parse(io.BytesIO(data))
 		return decoded_data
 
+	def get_firmware_partition_size(self) -> int:
+		"""Get the size of the firmware-containing partition of the iPod, in bytes"""
+		data = self._device.raw_command(CommandDataBuffer(
+			operation_code=0xc6,
+			request=bytes([iPodSubcommand.INFORMATION]),
+			incoming_data_length=4,
+			data_transfer_direction=DataTransferDirection.FROM_DEVICE
+		))
+		return data[1] * 4_000_000
+
 	def eject(self):
 		"""
 		Tell the iPod that it is "OK to Disconnect". Also reboots an iPod after an update.

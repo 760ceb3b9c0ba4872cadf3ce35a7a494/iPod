@@ -21,6 +21,7 @@ class iPodSubcommand(IntEnum):
 	UPDATE_CHUNK = 0x91
 	UPDATE_END = 0x92
 	REPARTITION = 0x94
+	INFORMATION = 0x95
 	UPDATE_FINALIZE = 0x31
 
 
@@ -124,12 +125,14 @@ class CommandDataBuffer:
 			buffer.seek(0)
 			return buffer.read()
 		elif self.operation_code == 0xc6:
+			# apple specific opcodes
 			subcommand = self.request[0]
 			if subcommand in {
 				iPodSubcommand.UPDATE_START,
 				iPodSubcommand.UPDATE_END,
 				iPodSubcommand.UPDATE_FINALIZE,
 				iPodSubcommand.REPARTITION,
+				iPodSubcommand.INFORMATION
 			}:
 				limit = 15
 			elif subcommand == iPodSubcommand.UPDATE_CHUNK:

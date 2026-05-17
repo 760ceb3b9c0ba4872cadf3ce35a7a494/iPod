@@ -26,9 +26,23 @@ class iPodSubcommand(IntEnum):
 
 
 class OperationCode(IntEnum):
+	# only some operation codes are implemented here
+	# see https://www.t10.org/lists/op-num.htm
+
+	# group 0 - six-byte commands (00 to 1F)
 	INQUIRY = 0x12
+	PREVENT_ALLOW_MEDIUM_REMOVAL = 0x1E
+	START_STOP_UNIT = 0x1B
+
+	# group 1 - ten-byte commands (20 to 3F)
+	READ_CAPACITY = 0x25
 	READ_DEFECT_DATA = 0x37
+
+	# group 2 - ten-byte commands (40 to 5F)
 	LOG_SENSE = 0x4d
+
+	# group 6 - vendor-specific
+	IPOD = 0xC6  # iPod proprietary opcode
 
 
 @dataclass()
@@ -52,8 +66,8 @@ class CommandDataBuffer:
 	incoming_data_length: int = 0  # also important as wel
 
 	def to_bytes(self) -> bytes:
-		if self.operation_code < 0x20:
-			# print(f"Sending CDB6 {self.operation_code=}")
+		if 0x00 <= self.operation_code < 0x20:
+			# group 0 - six-byte commands (00 to 1F)
 			if self.service_action is not None:
 				raise Exception("ServiceAction field not available in CDB6")
 			if len(self.request) != 4:
@@ -66,8 +80,9 @@ class CommandDataBuffer:
 			buffer.write(bytes([self.control]))
 			buffer.seek(0)
 			return buffer.read()
+
 		elif self.operation_code < 0x60:
-			# print(f"Sending CDB10 {self.operation_code=}")
+			# group 1 (20 to 3F) and group 2 (40 to 5F) - ten-byte commands
 			if len(self.request) != 8:
 				raise Exception(f"CDB10 request size is {len(self.request)} bytes, needs to be 8")  # its 8, right?
 
@@ -83,14 +98,18 @@ class CommandDataBuffer:
 
 			buffer.seek(0)
 			return buffer.read()
-		elif self.operation_code < 0x7e:
-			raise Exception("OperationCode is reserved")
-		elif self.operation_code == 0x7e:
-			raise Exception("variable extended CDBs are unimplemented")
-		elif self.operation_code == 0x7f:
-			raise Exception("variable CDBs are unimplemented")
+
+		elif self.operation_code < 0x80:
+			# group 3 - unimplemented stuff
+			if self.operation_code == 0x7e:
+				raise Exception("variable extended CDBs are unimplemented")
+			elif self.operation_code == 0x7f:
+				raise Exception("variable CDBs are unimplemented")
+			else:
+				raise Exception("OperationCode is reserved")
+
 		elif self.operation_code < 0xa0:
-			# print(f"Sending CDB16 {self.operation_code=}")
+			# group 4 - sixteen-byte commands (80 to 9F)
 			if len(self.request) != 14:
 				raise Exception(f"CDB16 request size is {len(self.request)} bytes, needs to be 14")
 
@@ -107,8 +126,10 @@ class CommandDataBuffer:
 
 			buffer.seek(0)
 			return buffer.read()
+
 		elif self.operation_code < 0xc0:
-			# print(f"Sending CDB12 {self.operation_code=}")
+			# group 5 - twelve-byte commands (A0 to BF)
+
 			if len(self.request) != 10:
 				raise Exception(f"CDB12 request size is {len(self.request)} bytes, needs to be 10")
 
@@ -124,8 +145,10 @@ class CommandDataBuffer:
 
 			buffer.seek(0)
 			return buffer.read()
-		elif self.operation_code == 0xc6:
-			# apple specific opcodes
+
+		elif self.operation_code == OperationCode.IPOD:
+			# Apple proprietary opcode
+
 			subcommand = self.request[0]
 			if subcommand in {
 				iPodSubcommand.UPDATE_START,
@@ -149,7 +172,7 @@ class CommandDataBuffer:
 			buffer.seek(0)
 			return buffer.read()
 
-		raise ValueError(f"unhandled opcode {self.operation_code}")
+		raise ValueError(f"unhandled opcode 0x{self.operation_code:02x}")
 
 
 def create_inquiry_vital_product_data(page_code: int, allocation_length: int) -> CommandDataBuffer:

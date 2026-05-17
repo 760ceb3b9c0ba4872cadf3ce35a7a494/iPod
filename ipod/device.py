@@ -19,7 +19,7 @@ from .definitions import iPodTarget, iPodMode, iPodModel
 from .dfu import DFUDevice, DFUDeviceState
 from .platforms.base import BaseSCSIDevice, BaseUSBProvider, ConnectedDevice
 from .plist import iPodPlistParser
-from .scsi import CommandDataBuffer, iPodSubcommand, DataTransferDirection
+from .scsi import CommandDataBuffer, iPodSubcommand, DataTransferDirection, OperationCode
 from .utils import buffered
 
 
@@ -120,7 +120,7 @@ class iPodDeviceDiskMode(iPodDevice):
 	def get_firmware_partition_size(self) -> int:
 		"""Get the size of the firmware-containing partition of the iPod, in bytes"""
 		data = self._device.raw_command(CommandDataBuffer(
-			operation_code=0xc6,
+			operation_code=OperationCode.IPOD,
 			request=bytes([iPodSubcommand.INFORMATION]),
 			incoming_data_length=4,
 			data_transfer_direction=DataTransferDirection.FROM_DEVICE
@@ -133,11 +133,11 @@ class iPodDeviceDiskMode(iPodDevice):
 		"""
 		# thank you so, so, so, so much. https://ramblings.narrabilis.com/ejecting-ipod-under-linux
 		self._device.raw_command(CommandDataBuffer(
-			operation_code=0x1E,  # "PREVENT ALLOW MEDIUM REMOVAL"
+			operation_code=OperationCode.PREVENT_ALLOW_MEDIUM_REMOVAL,
 			request=bytes([0, 0, 0, 0])
 		))
 		self._device.raw_command(CommandDataBuffer(
-			operation_code=0x1b,  # "START STOP UNIT"
+			operation_code=OperationCode.START_STOP_UNIT,
 			request=bytes([
 				0b0000_0001,  # IMMED = 1
 				0b0000_0000,
@@ -149,7 +149,7 @@ class iPodDeviceDiskMode(iPodDevice):
 	def get_capacity(self) -> tuple[int, int]:
 		# returns: block count, block size
 		data = self._device.raw_command(CommandDataBuffer(
-			operation_code=0x25,
+			operation_code=OperationCode.READ_CAPACITY,
 			request=bytes(8),
 			incoming_data_length=8,
 			data_transfer_direction=DataTransferDirection.FROM_DEVICE
@@ -170,13 +170,13 @@ class iPodDeviceDiskMode(iPodDevice):
 		stream.write(int.to_bytes(length, 4, "big"))
 		stream.seek(0)
 		self._device.raw_command(CommandDataBuffer(
-			operation_code=0xc6,
+			operation_code=OperationCode.IPOD,
 			request=stream.read(),
 		))
 
 	def _update_end(self):
 		self._device.raw_command(CommandDataBuffer(
-			operation_code=0xc6,
+			operation_code=OperationCode.IPOD,
 			request=bytes([iPodSubcommand.UPDATE_END])
 		))
 
@@ -188,7 +188,7 @@ class iPodDeviceDiskMode(iPodDevice):
 		stream.write(int.to_bytes(size, 4, "big"))
 		stream.seek(0)
 		self._device.raw_command(CommandDataBuffer(
-			operation_code=0xc6,
+			operation_code=OperationCode.IPOD,
 			request=stream.read(),
 		))
 
@@ -208,7 +208,7 @@ class iPodDeviceDiskMode(iPodDevice):
 		request_stream.seek(0)
 
 		self._device.raw_command(CommandDataBuffer(
-			operation_code=0xc6,
+			operation_code=OperationCode.IPOD,
 			request=request_stream.read(),
 			outgoing_data=content,
 			data_transfer_direction=DataTransferDirection.TO_DEVICE
@@ -216,7 +216,7 @@ class iPodDeviceDiskMode(iPodDevice):
 
 	def finalize_updates(self):
 		self._device.raw_command(CommandDataBuffer(
-			operation_code=0xc6,
+			operation_code=OperationCode.IPOD,
 			request=bytes([iPodSubcommand.UPDATE_FINALIZE])  # i think the "LOEJ" bit was set
 		))
 

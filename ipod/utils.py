@@ -90,6 +90,9 @@ def macOS_get_mount_point(serial_number: str):
 		# this device is attached but not mounted rn.
 		return None
 
+	if "volumes" not in media_data[0]:
+		return None
+
 	for volume in media_data[0]["volumes"]:
 		if "mount_point" in volume:
 			return volume["mount_point"]

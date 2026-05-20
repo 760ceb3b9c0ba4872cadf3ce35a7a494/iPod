@@ -137,3 +137,25 @@ UPDATER_FAMILY_ID_INDEX: dict[int, iPodTarget] = {
 	35: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_B),
 	38: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_C),  # guessing for this one.
 }
+
+
+class iPodSoC(OrderedEnum):
+	S5L8740 = "8740"  # iPod nano (7th generation)
+	S5L8723 = "8723"  # iPod nano (6th generation)
+	S5L8730 = "8730"  # iPod nano (5th generation)
+	S5L8720 = "8720"  # iPod nano (4th generation)
+	S5L8702 = "8702"  # iPod nano (3rd generation) and iPod classic (6th generation)
+
+
+SOC_TO_MODELS: dict[iPodSoC, tuple[iPodModel]] = {
+	iPodSoC.S5L8740: (iPodModel.NANO_7G,),
+	iPodSoC.S5L8723: (iPodModel.NANO_6G,),
+	iPodSoC.S5L8730: (iPodModel.NANO_5G,),
+	iPodSoC.S5L8720: (iPodModel.NANO_4G,),
+	iPodSoC.S5L8702: (iPodModel.NANO_3G, iPodModel.CLASSIC_6G),
+}
+
+MODELS_TO_SOC: dict[iPodModel, iPodSoC] = {}
+for soc, models in SOC_TO_MODELS.items():
+	for model in models:
+		MODELS_TO_SOC[model] = soc

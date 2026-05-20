@@ -238,12 +238,16 @@ class PyUSBProvider(BaseUSBProvider):
 				bus=device.bus,
 				address=device.address,
 				port_number=device.port_number
-			) for device in usb.core.find(find_all=True, idVendor=APPLE_VID)
+			)
+			for device in usb.core.find(find_all=True, idVendor=APPLE_VID)
+			if device.idProduct in USB_PID_INDEX
 		]
 
 	def get_connected_device(self, device_id: str) -> PyUSBConnectedDevice | None:
 		device = _id_to_pyusb_device(device_id)
 		if not device:
+			return None
+		if device.idProduct not in USB_PID_INDEX:
 			return None
 		# noinspection PyUnresolvedReferences
 		return PyUSBConnectedDevice(

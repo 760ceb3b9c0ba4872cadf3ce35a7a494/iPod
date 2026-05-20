@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import plistlib
 from dataclasses import dataclass
 from typing import Optional
@@ -21,6 +23,15 @@ class AvailableSoftwareUpdate:
 	build_version: Optional[str]
 	firmware_url: str
 	documentation_url: str
+
+	def __gt__(self, other: AvailableSoftwareUpdate):
+		if not isinstance(other, AvailableSoftwareUpdate):
+			raise NotImplementedError
+
+		if self.product_version and other.product_version:
+			return tuple(map(int, other.product_version.split("."))) > tuple(map(int, self.product_version.split(".")))
+		else:
+			return self.build_id > other.build_id
 
 	def get_target_device(self) -> iPodTarget | None:
 		return UPDATER_FAMILY_ID_INDEX.get(self.updater_family_id)

@@ -8,8 +8,10 @@ import dataclasses
 from enum import Enum
 from typing import Optional
 
+from ordered_enum import OrderedEnum
 
-class iPodModel(Enum):
+
+class iPodModel(OrderedEnum):
 	NANO_3G = "nano_3g"
 	NANO_4G = "nano_4g"
 	NANO_5G = "nano_5g"
@@ -18,7 +20,7 @@ class iPodModel(Enum):
 	CLASSIC_6G = "classic_6g"  # or 6.5g/7g/7.5g, see https://freemyipod.org/wiki/Classic_6G
 
 
-class iPodMode(Enum):
+class iPodMode(OrderedEnum):
 	DISK = "disk"
 	DFU = "dfu"
 	WTF = "wtf"
@@ -28,7 +30,7 @@ class iPodMode(Enum):
 		return MODE_NAMES[self]
 
 
-class iPodSubvariant(Enum):
+class iPodSubvariant(OrderedEnum):
 	NANO_7G_2012 = "nano_7g_2012"
 	NANO_7G_2015 = "nano_7g_2015"
 	CLASSIC_6G_INITIAL = "classic_6g_initial"
@@ -37,7 +39,7 @@ class iPodSubvariant(Enum):
 	CLASSIC_6G_REV_C = "classic_6g_rev_C"
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(order=True)
 class iPodTarget:
 	# represents a specific target iPod
 	model: iPodModel

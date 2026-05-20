@@ -39,6 +39,11 @@ class AvailableSoftwareUpdate:
 	def is_compatible_with(self, target: iPodTarget) -> bool:
 		return self.get_target_device().is_compatible_with(target)
 
+	def get_pretty_version_name(self):
+		version_part = self.product_version or numeric_build_id_to_string(self.visible_build_id)
+		detailed_version_part = self.build_version or numeric_build_id_to_string(self.build_id)
+		return f"{version_part} ({detailed_version_part})"
+
 	def __repr__(self):
 		try:
 			target = self.get_target_device()

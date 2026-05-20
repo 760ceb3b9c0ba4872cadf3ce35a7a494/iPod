@@ -160,6 +160,9 @@ class CommandDataBuffer:
 				limit = 15
 			elif subcommand == iPodSubcommand.UPDATE_CHUNK:
 				limit = 9
+			elif subcommand == 0x96:
+				# ipod_sun special command - https://freemyipod.org/wiki/Ipod_sun
+				limit = 6
 			else:
 				raise Exception(f"cannot serialize subcommand {subcommand:x}")
 

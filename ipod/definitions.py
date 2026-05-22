@@ -39,12 +39,15 @@ class iPodSubvariant(OrderedEnum):
 	CLASSIC_6G_REV_C = "classic_6g_rev_C"
 
 
-@dataclasses.dataclass(order=True)
+@dataclasses.dataclass(order=True, eq=True, frozen=True)
 class iPodTarget:
 	# represents a specific target iPod
 	model: iPodModel
 	subvariant: Optional[iPodSubvariant] = None
 	mode: Optional[iPodMode] = None
+
+	def with_mode(self, mode: Optional[iPodMode]):
+		return iPodTarget(self.model, self.subvariant, mode)
 
 	def is_compatible_with(self, device: iPodTarget):
 		"""check if this iPodTarget is compatible with another (assuming `self` is the target `device` is being checked against)"""

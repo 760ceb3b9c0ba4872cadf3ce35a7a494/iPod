@@ -14,8 +14,19 @@ HTTPS_DNLD_HOST = "secure-appldnld.apple.com"
 EDGESUITE_DNLD_HOST = "appldnld.apple.com.edgesuite.net"
 
 
-@dataclass(eq=True)
-class AvailableSoftwareUpdate:
+class BaseAvailableSoftware:
+	def get_target_device(self) -> iPodTarget: ...
+	def _version_as_tuple(self) -> tuple[int, ...]: ...
+
+	def __gt__(self, other):
+		if not isinstance(other, self.__class__):
+			raise NotImplementedError
+
+		return (self.get_target_device(), self._version_as_tuple()) > (other.get_target_device(), other._version_as_tuple())
+
+
+@dataclass(eq=True, frozen=True)
+class AvailableSoftwareUpdate(BaseAvailableSoftware):
 	updater_family_id: int
 	build_id: Optional[int]
 	visible_build_id: Optional[int]
@@ -24,14 +35,12 @@ class AvailableSoftwareUpdate:
 	firmware_url: str
 	documentation_url: str
 
-	def __gt__(self, other: AvailableSoftwareUpdate):
-		if not isinstance(other, AvailableSoftwareUpdate):
-			raise NotImplementedError
-
-		if self.product_version and other.product_version:
-			return tuple(map(int, other.product_version.split("."))) > tuple(map(int, self.product_version.split(".")))
+	def _version_as_tuple(self):
+		if self.product_version:
+			return tuple(map(int, self.product_version.split(".")))
 		else:
-			return self.build_id > other.build_id
+			build_id = self.visible_build_id
+			return build_id >> 24 & 0b1111, build_id >> 20 & 0b1111, build_id >> 16 & 0b1111
 
 	def get_target_device(self) -> iPodTarget | None:
 		return UPDATER_FAMILY_ID_INDEX.get(self.updater_family_id)
@@ -55,23 +64,36 @@ class AvailableSoftwareUpdate:
 		else:
 			version = f"{numeric_build_id_to_string(self.visible_build_id)} ({numeric_build_id_to_string(self.build_id)})"
 
-		return f"<{self.__class__.__name__}: {version} for {target.get_pretty_model_name() if target else 'unknown iPod'}>"
+		return f"{self._version_as_tuple()} <{self.__class__.__name__}: {version} for {target.get_pretty_model_name() if target else 'unknown iPod'}>"
 
 
-@dataclass(kw_only=True)
-class AvailableRecoverySoftware:
-	target: iPodTarget
+@dataclass(kw_only=True, frozen=True)
+class AvailableRecoverySoftware(BaseAvailableSoftware):
+	usb_pid: int
 	build_version: Optional[str]
 	firmware_url: str
 
+	def _version_as_tuple(self):
+		if "." in self.build_version:
+			return tuple(map(int, self.build_version.split("."))) if self.build_version else (0)
+		else:
+			return (int(self.build_version[3:]), )
+
+	def get_target_device(self) -> iPodTarget:
+		return USB_PID_INDEX[self.usb_pid]
+
 	def __repr__(self):
-		return f"<{self.__class__.__name__}: {self.build_version} for {self.target.get_pretty_name()}>"
+		return f"<{self.__class__.__name__}: {self.build_version} for {self.get_target_device().get_pretty_name()}>"
 
 
 @dataclass(kw_only=True)
 class AvailableUpdates:
-	recovery_software: list[AvailableRecoverySoftware]
-	software_updates: list[AvailableSoftwareUpdate]
+	recovery_software: set[AvailableRecoverySoftware]
+	software_updates: set[AvailableSoftwareUpdate]
+
+	def extend_with(self, other: AvailableUpdates):
+		self.recovery_software.update(other.recovery_software)
+		self.software_updates.update(other.software_updates)
 
 	@classmethod
 	def from_phobos_plist(cls, plist_data: str | bytes, *, fix_urls: bool = True):
@@ -86,7 +108,7 @@ class AvailableUpdates:
 			else:
 				return url
 
-		recovery_software: list[AvailableRecoverySoftware] = []
+		recovery_software: set[AvailableRecoverySoftware] = set()
 		seen_firmware_ids = set()
 		for by_version_data in data["MobileDeviceSoftwareVersionsByVersion"].values():
 			versions_data = by_version_data["RecoverySoftwareVersions"]
@@ -104,18 +126,17 @@ class AvailableUpdates:
 					seen_firmware_ids.add(firmware_id)
 
 					usb_pid = firmware_id >> 16
-					target = USB_PID_INDEX.get(usb_pid)
-					if not target:
+					if usb_pid not in USB_PID_INDEX:
+						# then we dont support this iPod, so ignore it
 						continue
 
-					recovery_software.append(AvailableRecoverySoftware(
-						target=target,
+					recovery_software.add(AvailableRecoverySoftware(
+						usb_pid=usb_pid,
 						build_version=firmware_data["BuildVersion"],
 						firmware_url=_fix_url(firmware_data["FirmwareURL"])
 					))
-		recovery_software.sort(key=lambda software: software.target.model)
 
-		software_updates: list[AvailableSoftwareUpdate] = [
+		software_updates: set[AvailableSoftwareUpdate] = {
 			AvailableSoftwareUpdate(
 				updater_family_id=int(item["UpdaterFamilyID"]),
 				build_id=int(item["BuildID"]) if "BuildID" in item else None,
@@ -125,14 +146,45 @@ class AvailableUpdates:
 				product_version=item.get("ProductVersion"),
 				build_version=item.get("BuildVersion")
 			) for item in data["iPodSoftwareVersions"].values()
-		]
-		software_updates = [update for update in software_updates if update.get_target_device() is not None]
-		software_updates.sort(key=lambda update: update.get_target_device())
+		}
+		software_updates = set(update for update in software_updates if update.get_target_device() is not None)
 
 		return cls(
 			software_updates=software_updates,
 			recovery_software=recovery_software
 		)
+
+	def recovery_software_by_usb_pid(self) -> dict[int, list[AvailableRecoverySoftware]]:
+		result = {}
+
+		for update in self.recovery_software:
+			key = update.usb_pid
+			if key is None:
+				continue
+			if key not in result:
+				result[key] = []
+			result[key].append(update)
+
+		for update_list in result.values():
+			update_list.sort()
+
+		return result
+
+	def software_updates_by_updater_family_id(self) -> dict[int, list[AvailableSoftwareUpdate]]:
+		result = {}
+
+		for update in self.software_updates:
+			key = update.updater_family_id
+			if key is None:
+				continue
+			if key not in result:
+				result[key] = []
+			result[key].append(update)
+
+		for update_list in result.values():
+			update_list.sort()
+
+		return result
 
 
 def fix_appldnld_url(phobos_url: str):
@@ -151,9 +203,9 @@ def fix_appldnld_url(phobos_url: str):
 	))
 
 
-_HISTORICAL_AVAILABLE_UPDATES = AvailableUpdates(
-	recovery_software=[],
-	software_updates=[
+HISTORICAL_AVAILABLE_UPDATES = AvailableUpdates(
+	recovery_software=set(),
+	software_updates={
 		# iPod classic (6th generation)
 		AvailableSoftwareUpdate(24, 151224320, 17006592, None, None, "https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-3940.20071115.0Iun5/iPod_24.1.0.3.ipsw", "https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-3940.20071115.0Iun5/iPodDocumentation_24.1.0.3.ipd"),
 		AvailableSoftwareUpdate(24, 152076288, 17858560, None, None, "https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4010.20080115.Ad4rF/iPod_24.1.1.ipsw", "https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4010.20080115.Ad4rF/iPodDocumentation_24.1.1.ipd"),
@@ -199,5 +251,5 @@ _HISTORICAL_AVAILABLE_UPDATES = AvailableUpdates(
 		# iPod nano (7th generation Mid 2015)
 		AvailableSoftwareUpdate(39, None, None, "1.1.1", "39A00025", "https://secure-appldnld.apple.com/ipod/sbml/osx/bundles/031-25237-20150715-D737390E-1C1F-11E5-9274-0ACEBE268FF7/iPod_1.1.1_39A00025.ipsw", "https://secure-appldnld.apple.com/ipod/sbml/osx/bundles/031-25237-20150715-D737390E-1C1F-11E5-9274-0ACEBE268FF7/iPodDocumentation_1.1.1_39A00025.ipd"),
 		AvailableSoftwareUpdate(39, None, None, "1.1.2", "39A10023", "https://secure-appldnld.apple.com/ipod/sbml/osx/bundles/031-59796-20160525-8E6A5D46-21FF-11E6-89D1-C5D3662719FC/iPod_1.1.2_39A10023.ipsw", "https://secure-appldnld.apple.com/ipod/sbml/osx/bundles/031-59796-20160525-8E6A5D46-21FF-11E6-89D1-C5D3662719FC/iPodDocumentation_1.1.2_39A10023.ipd")
-	]
+	}
 )

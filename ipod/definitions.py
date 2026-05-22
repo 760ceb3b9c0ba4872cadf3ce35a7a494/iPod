@@ -5,7 +5,6 @@ definitions for iPod models and updater family IDs
 from __future__ import annotations
 
 import dataclasses
-from enum import Enum
 from typing import Optional
 
 from ordered_enum import OrderedEnum
@@ -38,13 +37,24 @@ class iPodSubvariant(OrderedEnum):
 	CLASSIC_6G_REV_B = "classic_6g_rev_B"
 	CLASSIC_6G_REV_C = "classic_6g_rev_C"
 
+	def __lt__(self, other):
+		# make sure subvariants are sorted properly - this means that classic (6g) comes before classic (6g, Rev A)
+		if other is None:
+			return False
+		return super().__lt__(other)
 
-@dataclasses.dataclass(order=True, eq=True, frozen=True)
+
+@dataclasses.dataclass(eq=True, frozen=True)
 class iPodTarget:
 	# represents a specific target iPod
 	model: iPodModel
 	subvariant: Optional[iPodSubvariant] = None
 	mode: Optional[iPodMode] = None
+
+	def __gt__(self, other):
+		if not isinstance(other, iPodTarget):
+			raise NotImplementedError
+		return (self.model, self.subvariant, self.mode) > (other.model, other.subvariant, other.mode)
 
 	def with_mode(self, mode: Optional[iPodMode]):
 		return iPodTarget(self.model, self.subvariant, mode)

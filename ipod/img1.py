@@ -1,12 +1,12 @@
 """
 implementation of the MSE file format, used to store a list of IMG1 firmware partitions.
 """
+import io
+from dataclasses import dataclass
+from enum import Enum
+from typing import BinaryIO
 
 from .definitions import iPodSoC
-from dataclasses import dataclass
-from typing import BinaryIO
-from enum import Enum
-
 from .utils import buffered_copy
 
 
@@ -38,6 +38,21 @@ class IMG1Header:
 	header_signature: bytes
 	header_leftover: bytes
 
+	def to_stream(self, stream: BinaryIO):
+		stream.write(self.soc.value.encode("ascii"))
+		stream.write(self.version.value.encode("ascii"))
+		stream.write(self.signature_format.value.to_bytes(1))
+		stream.write(self.entry_point.to_bytes(4))
+		stream.write(self.body_length.to_bytes(4))
+		stream.write(self.data_length.to_bytes(4))
+		stream.write(self.footer_offset.to_bytes(4))
+		stream.write(self.footer_length.to_bytes(4))
+		stream.write(self.salt.to_bytes(32))
+		stream.write(self.unk0.to_bytes(2))
+		stream.write(self.unk1.to_bytes(2))
+		stream.write(self.header_signature)
+		stream.write(self.header_leftover)
+
 	@classmethod
 	def from_stream(cls, stream: BinaryIO):
 		try:
@@ -62,40 +77,71 @@ class IMG1Header:
 		)
 
 
+def looks_like_img1(stream: BinaryIO):
+	four_chars = stream.read(4)
+	stream.seek(-len(four_chars), io.SEEK_CUR)
+	try:
+		iPodSoC(four_chars.decode("ascii"))
+	except (ValueError, UnicodeDecodeError):
+		return False
+
+	return True
+
+
 class IMG1:
 	def __init__(self, stream: BinaryIO):
 		self.stream = stream
 		self._start = stream.tell()
-		self.header = IMG1Header.from_stream(stream)
+		self._header = None
+
+	@property
+	def header(self) -> IMG1Header:
+		return self._header
+
+	@classmethod
+	def from_stream(cls, stream: BinaryIO):
+		self = cls(stream)
+		self.read_header()
+		return self
 
 	def _seek(self, offset: int):
 		self.stream.seek(self._start + offset)
 
 	def _data_offset(self):
-		if self.header.soc in {iPodSoC.S5L8723, iPodSoC.S5L8740}:
+		if self._header.soc in {iPodSoC.S5L8723, iPodSoC.S5L8740}:
 			return 0x400
 		else:
 			return 0x600
 
+	def read_header(self) -> IMG1Header:
+		self._seek(0)
+		self._header = IMG1Header.from_stream(self.stream)
+		return self._header
+
+	def write_header(self, header: IMG1Header):
+		self._seek(0)
+		header.to_stream(self.stream)
+		self._header = header
+
 	def read_body(self) -> bytes:
 		self._seek(self._data_offset())
-		return self.stream.read(self.header.body_length)
+		return self.stream.read(self._header.body_length)
 
 	def write_body_to_stream(self, stream: BinaryIO):
-		if self.header.body_length > 0x1000000:
+		if self._header.body_length > 0x1000000:
 			# for files larger than 16 MB use chunked copying
 			buffered_copy(
 				source=self.stream,
 				destination=stream,
-				limit=self.header.body_length
+				limit=self._header.body_length
 			)
 		else:
 			stream.write(self.read_body())
 
 	def read_signature(self) -> bytes:
-		self._seek(self._data_offset() + self.header.body_length)
+		self._seek(self._data_offset() + self._header.body_length)
 		return self.stream.read(0x80)
 
 	def read_certificate(self) -> bytes:
-		self._seek(self._data_offset() + self.header.footer_offset)
-		return self.stream.read(self.header.footer_length)
+		self._seek(self._data_offset() + self._header.footer_offset)
+		return self.stream.read(self._header.footer_length)

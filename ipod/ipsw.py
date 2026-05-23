@@ -2,7 +2,7 @@
 implementation of the iPod Software (IPSW) file format, used to store iPod firmware images.
 only iPod-compatible firmware is supported, which is a small subset of IPSW files.
 """
-
+import io
 import plistlib
 import typing
 from dataclasses import dataclass
@@ -120,7 +120,7 @@ class RecoveryIPSWFile(_IPSWFile):
 
 		return [product_type_id_to_usb_pid(type_id)[0] for type_id in type_ids]
 
-	def get_target_devices(self) -> list[iPodTarget]:
+	def  get_target_devices(self) -> list[iPodTarget]:
 		return [USB_PID_INDEX[pid] for pid in self.get_target_device_usb_pids()]
 
 	def is_compatible_with(self, target: iPodTarget):
@@ -200,3 +200,10 @@ class PayloadIPSWFile(_IPSWFile):
 
 	def get_firmware_mse_length(self) -> int:
 		return self._zipfile.getinfo(self.get_manifest().firmware_name).file_size
+
+
+def looks_like_it_might_be_an_ipsw(stream: BinaryIO) -> bool:
+	# will return True for all zipfiles, because we can't tell if its an IPSW until we parse it.
+	four_chars = stream.read(4)
+	stream.seek(-len(four_chars), io.SEEK_CUR)
+	return four_chars == b"PK\x03\x04"

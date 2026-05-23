@@ -1,10 +1,13 @@
 """
 implementation of the MSE file format, used to store a list of IMG1 firmware partitions.
 """
+from __future__ import annotations
+
+import dataclasses
 import io
 from dataclasses import dataclass
 from enum import Enum
-from typing import BinaryIO
+from typing import BinaryIO, Optional
 
 from .definitions import iPodSoC
 from .utils import buffered_copy
@@ -22,34 +25,38 @@ class IMG1SignatureFormat(Enum):
 	X509_SIGNED = 4
 
 
-@dataclass
-class IMG1Header:
+@dataclass(kw_only=True)
+class IMG1Parameters:
 	soc: iPodSoC
-	version: IMG1Version
+	version: IMG1Version = IMG1Version.v2
 	signature_format: IMG1SignatureFormat
-	entry_point: int
+	entry_point: int = 0
+	salt: int = 0
+	unk0: int = 0
+	unk1: int = 0
+	header_signature: bytes = bytes(16)
+	header_leftover: bytes = bytes(4)
+
+
+@dataclass(kw_only=True)
+class IMG1Header(IMG1Parameters):
 	body_length: int
 	data_length: int
 	footer_offset: int
 	footer_length: int
-	salt: int
-	unk0: int
-	unk1: int
-	header_signature: bytes
-	header_leftover: bytes
 
 	def to_stream(self, stream: BinaryIO):
 		stream.write(self.soc.value.encode("ascii"))
 		stream.write(self.version.value.encode("ascii"))
-		stream.write(self.signature_format.value.to_bytes(1))
-		stream.write(self.entry_point.to_bytes(4))
-		stream.write(self.body_length.to_bytes(4))
-		stream.write(self.data_length.to_bytes(4))
-		stream.write(self.footer_offset.to_bytes(4))
-		stream.write(self.footer_length.to_bytes(4))
-		stream.write(self.salt.to_bytes(32))
-		stream.write(self.unk0.to_bytes(2))
-		stream.write(self.unk1.to_bytes(2))
+		stream.write(self.signature_format.value.to_bytes(1, "little"))
+		stream.write(self.entry_point.to_bytes(4, "little"))
+		stream.write(self.body_length.to_bytes(4, "little"))
+		stream.write(self.data_length.to_bytes(4, "little"))
+		stream.write(self.footer_offset.to_bytes(4, "little"))
+		stream.write(self.footer_length.to_bytes(4, "little"))
+		stream.write(self.salt.to_bytes(32, "little"))
+		stream.write(self.unk0.to_bytes(2, "little"))
+		stream.write(self.unk1.to_bytes(2, "little"))
 		stream.write(self.header_signature)
 		stream.write(self.header_leftover)
 
@@ -88,6 +95,13 @@ def looks_like_img1(stream: BinaryIO):
 	return True
 
 
+def _body_offset_for_soc(soc: iPodSoC):
+	if soc in {iPodSoC.S5L8723, iPodSoC.S5L8740}:
+		return 0x400
+	else:
+		return 0x600
+
+
 class IMG1:
 	def __init__(self, stream: BinaryIO):
 		self.stream = stream
@@ -104,14 +118,49 @@ class IMG1:
 		self.read_header()
 		return self
 
+	@classmethod
+	def from_parts(
+			cls,
+			stream: BinaryIO,
+			*,
+			parameters: IMG1Parameters,
+			body_stream: BinaryIO,
+			body_length: Optional[int] = None,
+			signature_data: bytes,
+			certificate_data: bytes,
+	):
+		if body_length is None:
+			body_stream.seek(0, io.SEEK_END)
+			body_length = body_stream.tell()
+			body_stream.seek(0)
+
+		header = IMG1Header(
+			**dataclasses.asdict(parameters),
+			body_length=body_length,
+			data_length=body_length + len(signature_data) + len(certificate_data),
+			footer_offset=body_length + len(signature_data),
+			footer_length=len(certificate_data)
+		)
+		self = cls(stream)
+		self.write_header(header)
+		self.write_body_from_stream(body_stream)
+		self.write_signature(signature_data)
+		self.write_certificate(certificate_data)
+		return self
+
+	def copy_from(self, other: IMG1):
+		self.write_header(other.header)
+		self.write_signature(other.read_signature())
+		self.write_certificate(other.read_certificate())
+		# minimize allocation:
+		other._seek(other._body_offset())
+		self.write_body_from_stream(other.stream)
+
 	def _seek(self, offset: int):
 		self.stream.seek(self._start + offset)
 
-	def _data_offset(self):
-		if self._header.soc in {iPodSoC.S5L8723, iPodSoC.S5L8740}:
-			return 0x400
-		else:
-			return 0x600
+	def _body_offset(self):
+		return _body_offset_for_soc(self.header.soc)
 
 	def read_header(self) -> IMG1Header:
 		self._seek(0)
@@ -124,11 +173,29 @@ class IMG1:
 		self._header = header
 
 	def read_body(self) -> bytes:
-		self._seek(self._data_offset())
+		self._seek(self._body_offset())
 		return self.stream.read(self._header.body_length)
 
-	def write_body_to_stream(self, stream: BinaryIO):
-		if self._header.body_length > 0x1000000:
+	def write_body(self, data: bytes):
+		if len(data) != self._header.body_length:
+			raise ValueError("body is the wrong length")
+		self._seek(self._body_offset())
+		self.stream.write(data)
+
+	def write_body_from_stream(self, stream: BinaryIO):
+		self._seek(self._body_offset())
+		if self._header.body_length > 0x1_000_000:
+			# for files larger than 16 MB use chunked copying
+			buffered_copy(
+				source=self.stream,
+				destination=stream,
+				limit=self._header.body_length
+			)
+		else:
+			self.write_body(stream.read(self._header.body_length))
+
+	def read_body_to_stream(self, stream: BinaryIO):
+		if self._header.body_length > 0x1_000_000:
 			# for files larger than 16 MB use chunked copying
 			buffered_copy(
 				source=self.stream,
@@ -139,9 +206,17 @@ class IMG1:
 			stream.write(self.read_body())
 
 	def read_signature(self) -> bytes:
-		self._seek(self._data_offset() + self._header.body_length)
+		self._seek(self._body_offset() + self._header.body_length)
 		return self.stream.read(0x80)
 
+	def write_signature(self, data: bytes):
+		self._seek(self._body_offset() + self._header.body_length)
+		self.stream.write(data)
+
 	def read_certificate(self) -> bytes:
-		self._seek(self._data_offset() + self._header.footer_offset)
+		self._seek(self._body_offset() + self._header.footer_offset)
 		return self.stream.read(self._header.footer_length)
+
+	def write_certificate(self, data: bytes):
+		self._seek(self._body_offset() + self._header.footer_offset)
+		self.stream.write(data)

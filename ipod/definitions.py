@@ -159,6 +159,12 @@ class iPodSoC(OrderedEnum):
 	S5L8720 = "8720"  # iPod nano (4th generation)
 	S5L8702 = "8702"  # iPod nano (3rd generation) and iPod classic (6th generation)
 
+	def get_target_devices(self) -> tuple[iPodTarget, ...]:
+		return tuple(
+			iPodTarget(model, None, None)
+			for model in SOC_TO_MODELS[self]
+		)
+
 
 SOC_TO_MODELS: dict[iPodSoC, tuple[iPodModel]] = {
 	iPodSoC.S5L8740: (iPodModel.NANO_7G,),

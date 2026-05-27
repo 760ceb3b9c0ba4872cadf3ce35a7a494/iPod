@@ -33,6 +33,8 @@ plugins:
     handlers:
       python:
         paths: [.]
+        inventories:
+          - https://docs.python.org/3/objects.inv
         options:
           backlinks: tree
           docstring_options:
@@ -49,7 +51,7 @@ plugins:
           scoped_crossrefs: true
           separate_signature: true
           show_bases: false
-          show_inheritance_diagram: true
+          show_inheritance_diagram: false
           show_root_heading: true
           show_root_full_path: false
           show_signature_annotations: true
@@ -57,8 +59,13 @@ plugins:
           show_symbol_type_heading: false
           show_symbol_type_toc: true
           unwrap_annotated: true
+          show_if_no_docstring: true
+          members_order: source
 - gen-files:
     scripts:
     - docs-scripts/generate-pages.py
 - awesome-nav
 - search
+
+markdown_extensions:
+  - pymdownx.magiclink

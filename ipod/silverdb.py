@@ -1,3 +1,4 @@
+import abc
 import math
 import struct
 from dataclasses import dataclass
@@ -12,6 +13,7 @@ from ipod.utils import read_null_terminated_string, pixel_fromBGRA, pixels_from5
 
 @dataclass
 class _SilverDBSectionHeader:
+	"""Represents the raw header of a section in a SilverDB."""
 	type: str
 	resource_count: int
 	jumpy: bool
@@ -35,6 +37,7 @@ class _SilverDBSectionHeader:
 
 @dataclass
 class _SilverDBResourceHeader:
+	"""Represents the raw header of a single resource in a SilverDB."""
 	id: int
 	offset: int
 	length: int
@@ -54,17 +57,20 @@ class _SilverDBResourceHeader:
 
 
 @dataclass
-class SilverDBResource:
+class SilverDBResource(abc.ABC):
+	"""Base class inherited by all SilverDB resource types."""
 	id: int
 
 	@classmethod
+	@abc.abstractmethod
 	def from_stream(cls, id: int, stream: BinaryIO, length: int): ...
 
-	def to_stream(self, stream: BinaryIO):
-		raise NotImplementedError(f"{self.__class__.__name__}.to_stream")
+	@abc.abstractmethod
+	def to_stream(self, stream: BinaryIO): ...
 
 
 class Color(NamedTuple):
+	"""Represents an RGBA8888 color."""
 	r: int
 	g: int
 	b: int
@@ -74,9 +80,13 @@ class Color(NamedTuple):
 	def from_stream(cls, stream: BinaryIO):
 		return cls(*stream.read(4))
 
+	def to_stream(self, stream: BinaryIO):
+		stream.write(bytes(self))
+
 
 @dataclass
 class ColorResource(SilverDBResource):
+	"""Represents a color (COLR) resource within a SilverDB."""
 	color: Color
 
 	@classmethod
@@ -84,11 +94,13 @@ class ColorResource(SilverDBResource):
 		return cls(id=id, color=Color.from_stream(stream))
 
 	def to_stream(self, stream: BinaryIO):
-		stream.write(bytes(self.color))
+		self.color.to_stream(stream)
 
 
 @dataclass
 class CLovResourceEntry:
+	"""Represents an entry within a SilverDB CLov resource."""
+
 	idk: bytes
 	unk_1: int
 	some_id: int
@@ -129,12 +141,12 @@ class CLovResourceEntry:
 
 @dataclass
 class CLovResource(SilverDBResource):
+	"""Represents a CLov resource within a SilverDB. TODO: what is CLov?"""
 	entries: list[CLovResourceEntry]
 
 	@classmethod
 	def from_stream(cls, id: int, stream: BinaryIO, length: int):
 		count = int.from_bytes(stream.read(4), "little")
-		print(id, count)
 		return cls(
 			id=id,
 			entries=[CLovResourceEntry.from_stream(stream) for _ in range(count)]
@@ -143,6 +155,7 @@ class CLovResource(SilverDBResource):
 
 @dataclass
 class StringResource(SilverDBResource):
+	"""Represents a string (Str, StrT, SCST, ACST) resource containing UTF-8 text within a SilverDB."""
 	string: str
 
 	@classmethod
@@ -155,6 +168,7 @@ class StringResource(SilverDBResource):
 
 
 class BitmapImageFormat(Enum):
+	"""Formats available to SilverDB bitmaps (BMap)"""
 	BGRA_8888 = 0x1888
 	GREYSCALE_4 = 0x0004
 	GREYSCALE_8 = 0x0008
@@ -163,8 +177,19 @@ class BitmapImageFormat(Enum):
 	PALETTE_65 = 0x0065
 
 
+_BITMAP_IMAGE_FORMAT_TO_FLAGS: dict[BitmapImageFormat, int] = {
+	BitmapImageFormat.BGRA_8888: 0x0020,
+	BitmapImageFormat.GREYSCALE_4: 0x0004,
+	BitmapImageFormat.GREYSCALE_8: 0x0008,
+	BitmapImageFormat.RGB_565: 0x0010,
+	BitmapImageFormat.PALETTE_64: 0x0008,
+	BitmapImageFormat.PALETTE_65: 0x0010
+}
+
+
 @dataclass
 class BitmapResource(SilverDBResource):
+	"""Represents a bitmap (BMap) or status-bar bitmap (STBm) resource within a SilverDB."""
 	image_format: BitmapImageFormat
 	image: PIL.Image.Image
 	sub_id: int
@@ -175,21 +200,27 @@ class BitmapResource(SilverDBResource):
 		image_format = BitmapImageFormat(int.from_bytes(stream.read(2), "little"))
 		unk_0 = int.from_bytes(stream.read(2), "little")
 		row_length = int.from_bytes(stream.read(2), "little")
+
+		# we don't store this, because there seems to be a perfect mapping from image format to flags.
 		flags = int.from_bytes(stream.read(2), "little")
-		file_unk1 = int.from_bytes(stream.read(4), "little")  # always 0
-		file_unk2 = int.from_bytes(stream.read(4), "little")  # always 0
-		assert file_unk1 == file_unk2 == 0
+		assert flags == _BITMAP_IMAGE_FORMAT_TO_FLAGS[image_format]
+
+		# padding
+		assert stream.read(8) == bytes(8)
+
 		height = int.from_bytes(stream.read(4), "little")
 		width = int.from_bytes(stream.read(4), "little")
+
+		# sub_id seems to sometimes mirror the resource ID, and sometimes equal zero.
 		sub_id = int.from_bytes(stream.read(4), "little")
+
 		data_size = int.from_bytes(stream.read(4), "little")
-
-		pixels = []
-		# file_stream = io.BytesIO(stream.read(data_size))  # lazy
-
-		greyscale = False
 		data_width = width
 
+		greyscale = False
+		pixels = []
+
+		# actual parsing here:
 		if image_format == BitmapImageFormat.BGRA_8888:
 			# BGRA, big endian
 			for _ in range((row_length // 4) * height):
@@ -210,6 +241,7 @@ class BitmapResource(SilverDBResource):
 			data_width = row_length
 			for _ in range(row_length * height):
 				pixels.append(stream.read(1)[0])
+
 		elif image_format == BitmapImageFormat.RGB_565:
 			# RGB565, not supported by Pillow
 			data_width = row_length // 2
@@ -239,6 +271,7 @@ class BitmapResource(SilverDBResource):
 		else:
 			raise NotImplementedError(f"{image_format=}")
 
+		# parsing over, let's make a Pillow image!
 		image = Image.new(
 			mode="L" if greyscale else "RGBA",
 			size=(data_width, height)
@@ -253,57 +286,52 @@ class BitmapResource(SilverDBResource):
 	def to_stream(self, stream: BinaryIO):
 		image_format = self.image_format
 		image = self.image
+		width, height = image.size
 
-		start_offset = stream.tell()
+		start_offset = stream.tell()  # we'll need this so we can seek back and calculate length.
 
 		stream.write(int.to_bytes(image_format.value, 2, "little"))
-		stream.write(int.to_bytes(self.unk_0, 2, "little"))  # unk0
+		stream.write(int.to_bytes(self.unk_0, 2, "little"))
 
+		flags = _BITMAP_IMAGE_FORMAT_TO_FLAGS[image_format]
 		if image_format == BitmapImageFormat.BGRA_8888:
 			# keep RGBA
-			flags = 0x0020
-			row_length = image.size[0] * 4
+			row_length = width * 4
 		elif image_format == BitmapImageFormat.GREYSCALE_4:
 			image = image.convert("L")
-			flags = 0x0004
 			row_length = math.ceil(image.size[0] / 2)  # will be used later
 		elif image_format == BitmapImageFormat.GREYSCALE_8:
 			image = image.convert("L")
-			flags = 0x0008
-			row_length = image.size[0]
+			row_length = width
 		elif image_format == BitmapImageFormat.RGB_565:
 			image = image.convert("RGB")
-			flags = 0x0010
-			row_length = image.size[0] * 2
+			row_length = width * 2
 		elif image_format == BitmapImageFormat.PALETTE_64:
 			# keep RGBA
-			flags = 0x0008
-			row_length = image.size[0]
+			row_length = width
 		elif image_format == BitmapImageFormat.PALETTE_65:
 			# keep RGBA
-			flags = 0x0010
-			row_length = image.size[0] * 2
+			row_length = width * 2
 		else:
 			raise ValueError(f"cannot pack unknown format {image_format:04x}")
 
 		stream.write(int.to_bytes(row_length, 2, "little"))
 		stream.write(int.to_bytes(flags, 2, "little"))
-		stream.write(bytes(4))  # unk1
-		stream.write(bytes(4))  # unk2
-		stream.write(int.to_bytes(image.size[1], 4, "little"))
-		stream.write(int.to_bytes(image.size[0], 4, "little"))
+		stream.write(bytes(8))
+		stream.write(int.to_bytes(height, 4, "little"))
+		stream.write(int.to_bytes(width, 4, "little"))
 		stream.write(int.to_bytes(self.sub_id, 4, "little"))
-		length_offset = stream.tell()  # hack: come back here to write length
-		stream.write(bytes(4))
-		# 32 bytes written
 
-		# header_end_offset = stream.tell()
+		# we'll seek back here to write length:
+		length_offset = stream.tell()
+		stream.write(bytes(4))
+
 		if image_format == BitmapImageFormat.BGRA_8888:
 			for pixel in image.getdata():
 				stream.write(pixel_toBGRA(pixel))
+
 		elif image_format == BitmapImageFormat.GREYSCALE_4:
-			width = image.size[0]
-			height = image.size[1]
+			# this image will already be type L (8-bit greyscale) so we mostly just have to bitcrush it to 4 bits:
 
 			pixels = list(image.getdata())
 
@@ -319,18 +347,23 @@ class BitmapResource(SilverDBResource):
 					i0, i1 = row[x_idx:x_idx + 2]
 					array.append(((i0 // 17) << 4) + (i1 // 17))
 			stream.write(array)
+
 		elif image_format == BitmapImageFormat.GREYSCALE_8:
+			# this image will already be type L, so the data is already in the right format.
 			stream.write(bytes(image.getdata()))
+
 		elif image_format == BitmapImageFormat.RGB_565:
 			for pixel in image.getdata():
 				stream.write(int.to_bytes(pixel_to565(pixel), 2, "little"))
+
 		elif image_format in {BitmapImageFormat.PALETTE_64, BitmapImageFormat.PALETTE_65}:
 			pixels = image.getdata()
-			unique_pixels = list(sorted(set(pixels)))
+			unique_pixels = list(sorted(set(pixels)))  # here's our palette!
 
 			if image_format == BitmapImageFormat.PALETTE_64:
 				if len(unique_pixels) > 0xFF:
 					raise ValueError(f"more than 255 colors in {self.id}")
+
 			elif image_format == BitmapImageFormat.PALETTE_65:
 				if len(unique_pixels) > 0xFFFF:
 					raise ValueError(f"more than 65535 colors in {self.id}")
@@ -343,21 +376,26 @@ class BitmapResource(SilverDBResource):
 			reverse_index = {color: n for n, color in enumerate(unique_pixels)}
 
 			for pixel in pixels:
-				stream.write(
-					int.to_bytes(reverse_index[pixel], 1 if image_format == BitmapImageFormat.PALETTE_64 else 2,
-								 "little"))
+				stream.write(int.to_bytes(
+					reverse_index[pixel],
+					length=1 if image_format == BitmapImageFormat.PALETTE_64 else 2,
+					byteorder="little"
+				))
 		else:
-			raise ValueError(f"unk format: {image_format}")
+			raise ValueError(f"unknown format: {image_format}")
 
+		# wheeeww. now we get to seek back and write our length value
 		end_offset = stream.tell()
 		length = (end_offset - start_offset)
 		stream.seek(length_offset)
-		stream.write(int.to_bytes((length - 32), 4, "little"))  # smaller to account for head
+		stream.write(int.to_bytes((length - 32), 4, "little"))  # subtract the 32-byte head
 		stream.seek(end_offset)
 
 
 @dataclass
 class UsagesResourceEntry:
+	"""Represents an entry within a SilverDB usages (SUse) resource."""
+
 	layout_id_0: int  # both these IDs exist in VLyt and TEVT
 	layout_id_1: int
 	vcvs_id: int  # exists in VCvs
@@ -407,6 +445,7 @@ class UsagesResourceEntry:
 
 		crap = stream.read(16)
 		if crap != b"\xFE\xFF\xFF\x7F" * 4:
+			# hmm, sometimes this stuff looks different, but it doesnt seem to matter?
 			# print(f"unk data: {stuff.hex(' ')}")
 			pass
 
@@ -453,6 +492,8 @@ class UsagesResourceEntry:
 
 @dataclass
 class UsagesResource(SilverDBResource):
+	"""Represents a usages (SUse) resource within a SilverDB."""
+
 	entries: list[UsagesResourceEntry]
 
 	@classmethod
@@ -468,6 +509,8 @@ class UsagesResource(SilverDBResource):
 
 @dataclass
 class ViewResourceEntry:
+	"""Represents an entry within a SilverDB View resource."""
+
 	id: int
 
 	@classmethod
@@ -514,6 +557,7 @@ class ViewResourceEntry:
 
 @dataclass
 class ViewResource(SilverDBResource):
+	"""Represents a view (View) resource within a SilverDB."""
 	entries: list[ViewResourceEntry]
 
 	@classmethod
@@ -524,6 +568,7 @@ class ViewResource(SilverDBResource):
 
 @dataclass
 class SourcesResourceEntry:
+	"""Represents an entry within a SilverDB sources (SORC) resource."""
 	id_0: int
 	unk_0: int
 	unk_1: int
@@ -550,6 +595,7 @@ class SourcesResourceEntry:
 
 @dataclass
 class SourcesResource(SilverDBResource):
+	"""Represents a sources (SORC) resource within a SilverDB."""
 	entries: list[SourcesResourceEntry]
 
 	@classmethod
@@ -564,6 +610,8 @@ class SourcesResource(SilverDBResource):
 
 
 class SliceParameters(NamedTuple):
+	"""Represents an image's corresponding 9-slice parameters,
+	defined by offsets from the top, bottom, left, and right sides, in pixel space."""
 	left: int
 	right: int
 	top: int
@@ -572,6 +620,8 @@ class SliceParameters(NamedTuple):
 
 @dataclass
 class DecorationResource(SilverDBResource):
+	"""Represents a decoration (DECO) resource within a SilverDB.
+	This resource contains 9-slice data for an image, and is used for certain rounded corners in the UI."""
 	image_id_0: int
 	image_id_1: Optional[int]
 	slice: SliceParameters
@@ -594,6 +644,7 @@ class DecorationResource(SilverDBResource):
 
 @dataclass
 class RawResource(SilverDBResource):
+	"""Type used for all unparseable SilverDB resources."""
 	data: bytes
 
 	@classmethod
@@ -609,7 +660,9 @@ class RawResource(SilverDBResource):
 
 @dataclass
 class LocalizedDateTimeResource(SilverDBResource):
-	referenced_ids: list[int]
+	"""Represents a localized date-time (LDTm) resource within a SilverDB."""
+
+	referenced_ids: list[int]  # a list of IDs referencing string resources
 	unk_0: int
 
 	@classmethod
@@ -638,9 +691,11 @@ class FontResourceStyle(Enum):
 
 @dataclass
 class FontResource(SilverDBResource):
-	font_name_string_id: int
-	font_size: int
-	font_style: FontResourceStyle  # 0 = Helvetica, 1 = Helvetica Bold, 2 = ipod_symbols ?
+	"""Represents a font (FONT) resource within a SilverDB."""
+
+	font_name_string_id: int  # ID of a string containing the name of the font
+	font_size: int  # seems to be in pixels
+	font_style: FontResourceStyle
 
 	@classmethod
 	def from_stream(cls, id: int, stream: BinaryIO, length: int):
@@ -659,6 +714,7 @@ class FontResource(SilverDBResource):
 
 @dataclass
 class SpeakableStringResource(SilverDBResource):
+	"""Represents a speakable string (SStr) resource within a SilverDB."""
 	speakable_id: bytes  # turn this to hex and you will find a file with this name in /Resources/Speakable/UISS0000/
 
 	@classmethod
@@ -679,6 +735,7 @@ class SpeakableStringResource(SilverDBResource):
 
 @dataclass
 class AnimationEntryT3DP:
+	"""Represents a T3DP animation entry(?) within a SilverDB ANIM resource."""
 	unk_2: int
 	unk_3: int
 	unk_4: int
@@ -714,6 +771,7 @@ class AnimationEntryT3DP:
 
 @dataclass
 class AnimationEntryRaw:
+	"""Represents any unparseable entry within a SilverDB ANIM resource."""
 	type: str
 	data: bytes
 
@@ -723,12 +781,14 @@ class AnimationEntryRaw:
 
 @dataclass
 class AnimationResource(SilverDBResource):
+	"""Represents an animation (ANIM) resource within a SilverDB."""
 	entries: list
 
 	@classmethod
 	def from_stream(cls, id: int, stream: BinaryIO, length: int):
 		count = int.from_bytes(stream.read(4), "little")
 		entries = []
+
 		for _ in range(count):
 			length = int.from_bytes(stream.read(4), "little")
 			magic = stream.read(4)[::-1]
@@ -741,6 +801,7 @@ class AnimationResource(SilverDBResource):
 			else:
 				entries.append(AnimationEntryRaw(type=type, data=stream.read(length - 4)))
 			stream.seek(offset + length)
+
 		return cls(id=id, entries=entries)
 
 	def to_stream(self, stream: BinaryIO):
@@ -751,11 +812,13 @@ class AnimationResource(SilverDBResource):
 			stream.write(bytes(4))
 			stream.write(b"ANIM")
 			data_start_offset = stream.tell()
+
 			if isinstance(entry, AnimationEntryRaw):
 				stream.write(entry.type.encode("ascii")[::-1])
 				stream.write(entry.data)
 			elif isinstance(entry, AnimationEntryT3DP):
 				entry.to_stream(stream)
+
 			end_offset = stream.tell()
 			length = end_offset - data_start_offset
 			stream.seek(start_offset)
@@ -763,7 +826,8 @@ class AnimationResource(SilverDBResource):
 			stream.seek(end_offset)
 
 
-SECTION_TO_RESOURCE_TYPE: dict[str, Type[SilverDBResource]] = {
+"""Maps section names to SilverDBResource types."""
+_SECTION_TO_RESOURCE_TYPE: dict[str, Type[SilverDBResource]] = {
 	# "View": ViewResource,
 	# "CLov": CLovResource,
 	"COLR": ColorResource,
@@ -782,7 +846,8 @@ SECTION_TO_RESOURCE_TYPE: dict[str, Type[SilverDBResource]] = {
 	"DECO": DecorationResource
 }
 
-SECTION_IS_JUMPY = {
+"""Maps section names to their jumpiness (apparently whether IDs are incremental). Seems to be constant for each type."""
+_SECTION_IS_JUMPY = {
 	"AALI": True,
 	"ACST": True,
 	"AEVT": False,
@@ -824,6 +889,7 @@ SECTION_IS_JUMPY = {
 
 @dataclass
 class SilverDBSection:
+	"""Represents a section within a SilverDB."""
 	type: str
 	resources: list[SilverDBResource]
 
@@ -833,9 +899,12 @@ class SilverDBSection:
 
 @dataclass
 class SilverDB:
+	"""Represents an iPod SilverDB, used to store resources, layouts, and bitmaps for the iPod UI."""
 	sections: list[SilverDBSection]
 
 	def get_section(self, section_type: str) -> SilverDBSection:
+		"""Get a section with the specified section type."""
+
 		try:
 			return next(iter(section for section in self.sections if section.type == section_type))
 		except StopIteration:
@@ -843,6 +912,7 @@ class SilverDB:
 
 	@classmethod
 	def from_stream(cls, stream: BinaryIO):
+		"""Parse a SilverDB from the given stream."""
 		start = stream.tell()
 
 		version = int.from_bytes(stream.read(4), "little")
@@ -860,6 +930,7 @@ class SilverDB:
 		for section_header in section_headers:
 			if section_header.type in sections_resources:
 				raise ValueError("duplicate table")
+			assert section_header.jumpy == _SECTION_IS_JUMPY[section_header.type]
 			stream.seek(start + section_header.offset)
 			sections_resources[section_header.type] = tuple((
 				_SilverDBResourceHeader.from_stream(stream)
@@ -874,7 +945,7 @@ class SilverDB:
 		sections = []
 
 		for section_type, resource_headers in sections_resources.items():
-			section_resource_class = SECTION_TO_RESOURCE_TYPE.get(section_type, RawResource)
+			section_resource_class = _SECTION_TO_RESOURCE_TYPE.get(section_type, RawResource)
 			end_resources = []
 			for resource_header in resource_headers:
 				# print(f"{section_type} {resource_header.id} {resource_header.offset} {resource_header.length}")
@@ -894,13 +965,11 @@ class SilverDB:
 		)
 
 	def to_stream(self, stream: BinaryIO):
+		"""Save the SilverDB to the given stream."""
 		section_headers_length = (4 * 4 * len(self.sections))
 		resource_headers_length = (4 * 3 * sum(len(section.resources) for section in self.sections))
 
-		header_length = (
-								section_headers_length +
-								resource_headers_length
-						) + 12
+		header_length = (section_headers_length + resource_headers_length) + 12
 
 		start = stream.tell()
 		stream.write((3).to_bytes(4, "little"))
@@ -915,7 +984,7 @@ class SilverDB:
 			section_header = _SilverDBSectionHeader(
 				type=section.type,
 				resource_count=len(section.resources),
-				jumpy=SECTION_IS_JUMPY[section.type],
+				jumpy=_SECTION_IS_JUMPY[section.type],
 				offset=-1
 			)
 			section_headers[section.type] = section_header

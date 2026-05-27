@@ -1,0 +1,71 @@
+site_name: iPod for Python
+theme:
+  name: material
+  palette:
+  - media: "(prefers-color-scheme)"
+    toggle:
+      icon: material/brightness-auto
+      name: Switch to light mode
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: blue
+    accent: blue
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: black
+    accent: blue
+    toggle:
+      icon: material/weather-night
+      name: Switch to system preference
+  icon:
+    logo: material/ipod
+    repo: fontawesome/brands/github
+
+repo_name: iPod
+repo_url: https://github.com/760ceb3b9c0ba4872cadf3ce35a7a494/iPod
+
+plugins:
+- mkdocstrings:
+    default_handler: python
+    handlers:
+      python:
+        paths: [.]
+        inventories:
+          - https://docs.python.org/3/objects.inv
+        options:
+          backlinks: tree
+          docstring_options:
+            ignore_init_summary: true
+          docstring_section_style: list
+          filters: public
+          heading_level: 1
+          inherited_members: true
+          line_length: 88
+          merge_init_into_class: true
+          parameter_headings: true
+          type_parameter_headings: true
+          relative_crossrefs: true
+          scoped_crossrefs: true
+          separate_signature: true
+          show_bases: false
+          show_inheritance_diagram: false
+          show_root_heading: true
+          show_root_full_path: false
+          show_signature_annotations: true
+          show_signature_type_parameters: true
+          show_symbol_type_heading: false
+          show_symbol_type_toc: true
+          unwrap_annotated: true
+          show_if_no_docstring: true
+          members_order: source
+- gen-files:
+    scripts:
+    - docs-scripts/generate-pages.py
+- awesome-nav
+- search
+
+markdown_extensions:
+  - pymdownx.magiclink

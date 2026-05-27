@@ -1,5 +1,5 @@
 """
-definitions for iPod models and updater family IDs
+Definitions for iPods and their models, variants, SoCs, and updater family IDs.
 """
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ from ordered_enum import OrderedEnum
 
 
 class iPodModel(OrderedEnum):
+	"""Enumerates supported iPod models."""
 	NANO_3G = "nano_3g"
 	NANO_4G = "nano_4g"
 	NANO_5G = "nano_5g"
@@ -20,22 +21,37 @@ class iPodModel(OrderedEnum):
 
 
 class iPodMode(OrderedEnum):
+	"""Enumerates the possible modes of an iPod."""
 	DISK = "disk"
+	"""'Disk mode' here encompasses both modes where the iPod is accessible as a mass storage device:
+	the normal mode of the iPod, and 'forced disk mode', usually referred to as just 'disk mode'."""
+
 	DFU = "dfu"
+	"""In DFU mode, the iPod accepts a second-stage bootloader in IMG1 format."""
+
 	WTF = "wtf"
+	"""In WTF mode (maybe *Where's The Firmware?*), the iPod accepts normal firmware images (like osos) in IMG1 format."""
 
 	@property
 	def pretty_name(self):
-		return MODE_NAMES[self]
+		return _MODE_NAMES[self]
 
 
 class iPodSubvariant(OrderedEnum):
+	"""Enumerates the subvariants of an iPod model."""
+
 	NANO_7G_2012 = "nano_7g_2012"
+	"""The initial iPod nano (7th generation), introduced in October 2012."""
 	NANO_7G_2015 = "nano_7g_2015"
+	"""The revised iPod nano (7th generation), introduced in July 2015. Referred to as "iPod nano (7th generation Mid 2015)"""
 	CLASSIC_6G_INITIAL = "classic_6g_initial"
+	"""The initial iPod classic (6th generation)"""
 	CLASSIC_6G_REV_A = "classic_6g_rev_A"
+	"""Revision A of the iPod classic (6th generation), also known as the 6.5th generation."""
 	CLASSIC_6G_REV_B = "classic_6g_rev_B"
+	"""Revision B of the iPod classic (6th generation), also known as the 7th generation."""
 	CLASSIC_6G_REV_C = "classic_6g_rev_C"
+	"""Revision C of the iPod classic (6th generation), also known as the 7.5th generation."""
 
 	def __lt__(self, other):
 		# make sure subvariants are sorted properly - this means that classic (6g) comes before classic (6g, Rev A)
@@ -46,10 +62,14 @@ class iPodSubvariant(OrderedEnum):
 
 @dataclasses.dataclass(eq=True, frozen=True)
 class iPodTarget:
-	# represents a specific target iPod
+	"""Represents a target iPod. Targets are used to establish a device's compatibility with firmware."""
+
 	model: iPodModel
+	"""The target model of iPod."""
 	subvariant: Optional[iPodSubvariant] = None
+	"""The target subvariant of iPod, or None if any subvariant is acceptable."""
 	mode: Optional[iPodMode] = None
+	"""The target mode of iPod, or None if any mode is acceptable."""
 
 	def __gt__(self, other):
 		if not isinstance(other, iPodTarget):
@@ -57,10 +77,11 @@ class iPodTarget:
 		return (self.model, self.subvariant, self.mode) > (other.model, other.subvariant, other.mode)
 
 	def with_mode(self, mode: Optional[iPodMode]):
+		"""Returns a copy of this iPodTarget with `mode` set to the new mode."""
 		return iPodTarget(self.model, self.subvariant, mode)
 
 	def is_compatible_with(self, device: iPodTarget):
-		"""check if this iPodTarget is compatible with another (assuming `self` is the target `device` is being checked against)"""
+		"""check if this iPodTarget is compatible with another, where `self` is the target `device` is being checked against."""
 		return (
 				(self.model == device.model) and
 				# None means any is ok :3
@@ -69,12 +90,14 @@ class iPodTarget:
 		)
 
 	def get_pretty_model_name(self) -> str:
-		for (name, target) in MODEL_NAME_TARGETS:
+		"""Returns a user-friendly name for this target's **model**, like `"iPod nano (6th generation)"`"""
+		for (name, target) in _MODEL_NAME_TARGETS:
 			if target.is_compatible_with(self):
 				return name
 		raise ValueError("no pretty model name found")
 
 	def get_pretty_name(self) -> str:
+		"""Returns a user-friendly name for this target, like `"iPod nano (6th generation) in WTF mode"`"""
 		name = self.get_pretty_model_name()
 		if self.mode:
 			return f"{name} in {self.mode.pretty_name} mode"
@@ -82,7 +105,7 @@ class iPodTarget:
 			return name
 
 
-MODEL_NAME_TARGETS: list[tuple[str, iPodTarget]] = [
+_MODEL_NAME_TARGETS: list[tuple[str, iPodTarget]] = [
 	("iPod nano (3rd generation)", iPodTarget(iPodModel.NANO_3G)),
 	("iPod nano (4th generation)", iPodTarget(iPodModel.NANO_4G)),
 	("iPod nano (5th generation)", iPodTarget(iPodModel.NANO_5G)),
@@ -96,13 +119,15 @@ MODEL_NAME_TARGETS: list[tuple[str, iPodTarget]] = [
 	("iPod classic (6th generation)", iPodTarget(iPodModel.CLASSIC_6G))
 ]
 
-MODE_NAMES: dict[iPodMode, str] = {
+_MODE_NAMES: dict[iPodMode, str] = {
 	iPodMode.DFU: "DFU",
 	iPodMode.WTF: "WTF",
 	iPodMode.DISK: "disk",
 }
 
-APPLE_VID = 0x05ac  # apple inc, http://www.linux-usb.org/usb.ids
+APPLE_VID = 0x05ac
+"""USB vendor ID for Apple Inc."""
+
 USB_PID_INDEX: dict[int, iPodTarget] = {
 	# https://freemyipod.org/wiki/Modes
 
@@ -135,6 +160,7 @@ USB_PID_INDEX: dict[int, iPodTarget] = {
 	0x1247: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_B, iPodMode.WTF),
 	0x1250: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_C, iPodMode.WTF),
 }
+"""Mapping of USB product IDs to applicable iPod targets."""
 
 UPDATER_FAMILY_ID_INDEX: dict[int, iPodTarget] = {
 	# https://freemyipod.org/wiki/Hardware
@@ -150,23 +176,31 @@ UPDATER_FAMILY_ID_INDEX: dict[int, iPodTarget] = {
 	35: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_B),
 	38: iPodTarget(iPodModel.CLASSIC_6G, iPodSubvariant.CLASSIC_6G_REV_C),  # guessing for this one.
 }
+"""Mapping of iPod updater family IDs to applicable iPod targets."""
 
 
 class iPodSoC(OrderedEnum):
-	S5L8740 = "8740"  # iPod nano (7th generation)
-	S5L8723 = "8723"  # iPod nano (6th generation)
-	S5L8730 = "8730"  # iPod nano (5th generation)
-	S5L8720 = "8720"  # iPod nano (4th generation)
-	S5L8702 = "8702"  # iPod nano (3rd generation) and iPod classic (6th generation)
+	"""Enumeration of [SoC](https://en.wikipedia.org/wiki/System_on_a_chip)s used by iPod devices."""
+	S5L8740 = "8740"
+	"""Samsung S5L8740, used in the iPod nano (7th generation)"""
+	S5L8723 = "8723"
+	"""Samsung S5L8723, used in the iPod nano (6th generation)"""
+	S5L8730 = "8730"
+	"""Samsung S5L8730, used in the iPod nano (5th generation)"""
+	S5L8720 = "8720"
+	"""Samsung S5L8720, used in the iPod nano (4th generation)"""
+	S5L8702 = "8702"
+	"""Samsung S5L8702, used in the iPod nano (3rd generation) and iPod classic (6th generation)"""
 
 	def get_target_devices(self) -> tuple[iPodTarget, ...]:
+		"""List the iPodTargets applicable to this SoC."""
 		return tuple(
 			iPodTarget(model, None, None)
-			for model in SOC_TO_MODELS[self]
+			for model in _SOC_TO_MODELS[self]
 		)
 
 
-SOC_TO_MODELS: dict[iPodSoC, tuple[iPodModel]] = {
+_SOC_TO_MODELS: dict[iPodSoC, tuple[iPodModel]] = {
 	iPodSoC.S5L8740: (iPodModel.NANO_7G,),
 	iPodSoC.S5L8723: (iPodModel.NANO_6G,),
 	iPodSoC.S5L8730: (iPodModel.NANO_5G,),
@@ -174,7 +208,7 @@ SOC_TO_MODELS: dict[iPodSoC, tuple[iPodModel]] = {
 	iPodSoC.S5L8702: (iPodModel.NANO_3G, iPodModel.CLASSIC_6G),
 }
 
-MODELS_TO_SOC: dict[iPodModel, iPodSoC] = {}
-for soc, models in SOC_TO_MODELS.items():
+_MODELS_TO_SOC: dict[iPodModel, iPodSoC] = {}
+for soc, models in _SOC_TO_MODELS.items():
 	for model in models:
-		MODELS_TO_SOC[model] = soc
+		_MODELS_TO_SOC[model] = soc

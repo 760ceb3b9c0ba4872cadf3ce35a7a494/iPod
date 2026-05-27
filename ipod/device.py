@@ -1,5 +1,5 @@
 """
-implementation of the Device Firmware Update (DFU) protocol
+Representations of connected iPod devices
 """
 
 from __future__ import annotations
@@ -29,11 +29,15 @@ class iPodDevice:
 
 
 class iPodUpdateKind(Enum):
+	"""Enumerates the two kinds of iPod firmware updates."""
 	BOOTLOADER = "bootloader"
+	"""The bootloader, sent in IMG1 format."""
 	FIRMWARE = "firmware"
+	"""The firmware payload, sent in MSE format."""
 
 
 class iPodProvider:
+	"""Provider for iPod devices. Uses one of various backends depending on the operating system."""
 	_usb_provider: BaseUSBProvider
 
 	def __enter__(self):
@@ -61,9 +65,11 @@ class iPodProvider:
 		self._usb_provider = usb_provider
 
 	def list_devices(self) -> Iterable[ConnectedDevice]:
+		"""Provides a listing of connected iPods."""
 		return self._usb_provider.list_connected_devices()
 
-	def get_device(self, device: str | ConnectedDevice):
+	def get_device(self, device: str | ConnectedDevice) -> iPodDeviceDFU | iPodDeviceDiskMode | None:
+		"""Given a device ID or a ConnectedDevice, returns the applicable iPod device."""
 		if isinstance(device, str):
 			connected_device = self._usb_provider.get_connected_device(device)
 			if not connected_device:
@@ -89,6 +95,7 @@ class iPodProvider:
 
 
 class iPodDeviceDiskMode(iPodDevice):
+	"""Represents a connected iPod in disk mode (either normal mode or 'forced disk mode')"""
 	def __init__(
 			self,
 			*,
@@ -98,7 +105,8 @@ class iPodDeviceDiskMode(iPodDevice):
 		super().__init__(target=target)
 		self._device = device
 
-	def get_device_information_raw(self):
+	def get_device_information_raw(self) -> bytes:
+		"""Get information about this iPod in its original plist format."""
 		self._device.inquiry_vital_product_data(0xc0, 0xfc)
 		stream = io.BytesIO()
 		for page in range(0xc2, 0xff):
@@ -110,15 +118,17 @@ class iPodDeviceDiskMode(iPodDevice):
 		return stream.read()
 
 	def test(self):
+		"""Test to ensure the iPod is properly responding to SCSI commands."""
 		self._device.inquiry_vital_product_data(0x0, 0x10)
 
-	def get_device_information(self):
+	def get_device_information(self) -> dict:
+		"""Get information about this iPod."""
 		data = self.get_device_information_raw()
 		decoded_data = iPodPlistParser(dict_type=dict).parse(io.BytesIO(data))
 		return decoded_data
 
 	def get_firmware_partition_size(self) -> int:
-		"""Get the size of the firmware-containing partition of the iPod, in bytes"""
+		"""Get the size of the firmware-containing partition of the iPod, in bytes."""
 		data = self._device.raw_command(CommandDataBuffer(
 			operation_code=OperationCode.IPOD,
 			request=bytes([iPodSubcommand.INFORMATION]),
@@ -128,9 +138,7 @@ class iPodDeviceDiskMode(iPodDevice):
 		return data[1] * 4_000_000
 
 	def eject(self):
-		"""
-		Tell the iPod that it is "OK to Disconnect". Also reboots an iPod after an update.
-		"""
+		"""Tell the iPod that it is "OK to Disconnect". Also reboots an iPod after an update."""
 		# thank you so, so, so, so much. https://ramblings.narrabilis.com/ejecting-ipod-under-linux
 		self._device.raw_command(CommandDataBuffer(
 			operation_code=OperationCode.PREVENT_ALLOW_MEDIUM_REMOVAL,
@@ -147,7 +155,13 @@ class iPodDeviceDiskMode(iPodDevice):
 		))
 
 	def get_capacity(self) -> tuple[int, int]:
-		# returns: block count, block size
+		"""
+		Get the storage capacity of this iPod.
+
+		Returns:
+			block count, block size
+		"""
+
 		data = self._device.raw_command(CommandDataBuffer(
 			operation_code=OperationCode.READ_CAPACITY,
 			request=bytes(8),
@@ -165,7 +179,7 @@ class iPodDeviceDiskMode(iPodDevice):
 		stream.write(bytes([
 			1 if kind == iPodUpdateKind.BOOTLOADER else
 			0 if kind == iPodUpdateKind.FIRMWARE else
-			0
+			None
 		]))
 		stream.write(int.to_bytes(length, 4, "big"))
 		stream.seek(0)
@@ -180,12 +194,21 @@ class iPodDeviceDiskMode(iPodDevice):
 			request=bytes([iPodSubcommand.UPDATE_END])
 		))
 
-	def repartition(self, size):
-		if size % 0x1000:
+	def repartition(self, firmware_partition_size: int):
+		"""
+		Repartition this iPod.
+
+		Parameters:
+			firmware_partition_size: The size of the new firmware partition to create. Must be a multiple of 4096.
+
+		Warning:
+			This will erase all data on your iPod!
+		"""
+		if firmware_partition_size % 0x1000:
 			raise Exception("invalid size, must be divisible by 4096")
 		stream = io.BytesIO()
 		stream.write(bytes([iPodSubcommand.REPARTITION]))
-		stream.write(int.to_bytes(size, 4, "big"))
+		stream.write(int.to_bytes(firmware_partition_size, 4, "big"))
 		stream.seek(0)
 		self._device.raw_command(CommandDataBuffer(
 			operation_code=OperationCode.IPOD,
@@ -215,6 +238,7 @@ class iPodDeviceDiskMode(iPodDevice):
 		))
 
 	def finalize_updates(self):
+		"""Indicate to the iPod that firmware updates are complete."""
 		self._device.raw_command(CommandDataBuffer(
 			operation_code=OperationCode.IPOD,
 			request=bytes([iPodSubcommand.UPDATE_FINALIZE])  # i think the "LOEJ" bit was set
@@ -228,6 +252,16 @@ class iPodDeviceDiskMode(iPodDevice):
 			block_size: int = 0x8000,
 			on_progress: Optional[Callable[[iPodFirmwareSendState], None]] = None
 	):
+		"""
+		Perform an iPod software update.
+
+		Parameters:
+			kind: The kind of update to perform
+			stream: Stream containing the firmware data. The data format depends on `kind`.
+			length: Length of the firmware data
+			block_size: Size of block to use to transfer the update
+			on_progress: Callback for progress updates during the update process.
+		"""
 		self._update_start(kind, length)
 		block_count = math.ceil(length / block_size)
 		for block_number in range(block_count):
@@ -247,25 +281,41 @@ class iPodDeviceDiskMode(iPodDevice):
 		self._update_end()  # this can take some time
 
 	def get_mount_point(self) -> Path | None:
+		"""Get the mount point of this iPod, if it is mounted by the operating system."""
 		return self._device.get_mount_point()
 
-	def is_kernel_driver_active(self):
+	def is_kernel_driver_active(self) -> bool:
+		"""Determine if the operating system has control of the iPod.
+
+		On macOS, the kernel driver **must be inactive** to access the iPod in Python,
+		so it must be detached before use. On other platforms, the iPod should be accessible
+		regardless of whether it is in use by the operating system."""
 		return self._device.is_kernel_driver_active()
 
 	def detach_kernel_driver(self):
+		"""Detach the kernel driver from the iPod.
+
+		Warning:
+			Calling this is equivalent to unplugging a USB device without ejecting it first.
+			You should safely unmount the iPod's mass storage drive before detaching the kernel driver,
+			although you do not have to actually eject the iPod.
+		"""
 		return self._device.detach_kernel_driver()
 
 	def attach_kernel_driver(self):
+		"""Reattach the kernel driver to the iPod."""
 		return self._device.attach_kernel_driver()
 
 
 @dataclass()
 class iPodFirmwareSendState:
+	"""Represents the progress of a software update."""
 	block_number: int
 	block_count: int | None = None
 
 
 class iPodDeviceDFU(iPodDevice):
+	"""Represents a connected iPod in DFU (Device Firmware Update) mode."""
 	def __init__(
 			self,
 			*,
@@ -276,6 +326,7 @@ class iPodDeviceDFU(iPodDevice):
 
 		self.dfu_host = dfu_host
 
+	# TODO: make these private
 	def is_ready_for_firmware_block(self) -> bool:
 		status = self.dfu_host.get_status()
 
@@ -327,6 +378,19 @@ class iPodDeviceDFU(iPodDevice):
 			block_size: int = 0x800,
 			on_progress: Optional[Callable[[iPodFirmwareSendState], None]] = None
 	):
+		"""
+		Send firmware to the device.
+
+		Parameters:
+			stream: Stream containing the firmware data in IMG1 format
+			length: Length of the firmware data
+			block_size: Size of block to use to transfer the update
+			on_progress: Callback for progress updates during the sending process.
+
+		Note:
+			This is **not** a firmware update. DFU mode is used only to boot firmware, and actual
+			permanent software updates are always performed in disk mode.
+		"""
 		include_checksum = self.target.model == iPodModel.NANO_3G  # nano 3g requires a checksum
 		start_offset = stream.tell()
 

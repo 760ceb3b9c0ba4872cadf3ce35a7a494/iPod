@@ -5,10 +5,12 @@ from plistlib import _PlistParser
 # noinspection PyAttributeOutsideInit
 class iPodPlistParser(_PlistParser):
 	"""
-	Apple appears to have a non-compliant plist implementation for certain iPods.
+	Apple appears to have a non-compliant property list implementation for certain iPods.
 	Rather than a dictionary, the array type is used for objects with integer keys, like:
-		<array><key>1234</key><string>Value</string></array>
-	This HACK patches the standard plistlib with support for this broken plist format.
+	```xml
+	<array><key>1234</key><string>Value</string></array>
+	```
+	This HACK patches the standard Python `plistlib` to add support for this broken plist format.
 	"""
 
 	def end_key(self):

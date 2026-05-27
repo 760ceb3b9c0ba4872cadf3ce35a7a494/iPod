@@ -1,3 +1,8 @@
+"""
+iPod-specific implementation of Apple's Phobos system for downloading firmware updates for devices,
+as well as implementations of more general software update stuff.
+"""
+
 from __future__ import annotations
 
 import plistlib
@@ -9,9 +14,11 @@ from .definitions import UPDATER_FAMILY_ID_INDEX, iPodTarget, USB_PID_INDEX
 from .utils import numeric_build_id_to_string
 
 APPLE_PHOBOS_URL = "https://itunes.apple.com/WebObjects/MZStore.woa/wa/com.apple.jingle.appserver.client.MZITunesClientCheck/version"
-HTTP_DNLD_HOST = "appldnld.apple.com"
-HTTPS_DNLD_HOST = "secure-appldnld.apple.com"
-EDGESUITE_DNLD_HOST = "appldnld.apple.com.edgesuite.net"
+"""Apple iTunes Phobos lookup endpoint URL"""
+
+_HTTP_DNLD_HOST = "appldnld.apple.com"
+_HTTPS_DNLD_HOST = "secure-appldnld.apple.com"
+_EDGESUITE_DNLD_HOST = "appldnld.apple.com.edgesuite.net"
 
 
 class BaseAvailableSoftware:
@@ -27,13 +34,21 @@ class BaseAvailableSoftware:
 
 @dataclass(eq=True, frozen=True)
 class AvailableSoftwareUpdate(BaseAvailableSoftware):
+	"""Represents an available software update for an iPod."""
 	updater_family_id: int
+	"""Updater family ID targeted by this update"""
 	build_id: Optional[int]
+	"""Internal build ID of this update"""
 	visible_build_id: Optional[int]
+	"""User-facing build ID of this update"""
 	product_version: Optional[str]
+	"""User-facing version of this update"""
 	build_version: Optional[str]
+	"""Internal build version of this update"""
 	firmware_url: str
+	"""URL referencing the IPSW for this update"""
 	documentation_url: str
+	"""URL referencing the IPD-format documentation for this update (a ZIP file containing RTF files)"""
 
 	def _version_as_tuple(self):
 		if self.product_version:
@@ -43,12 +58,15 @@ class AvailableSoftwareUpdate(BaseAvailableSoftware):
 			return build_id >> 24 & 0b1111, build_id >> 20 & 0b1111, build_id >> 16 & 0b1111
 
 	def get_target_device(self) -> iPodTarget | None:
+		"""Return the target device that this update is applicable to"""
 		return UPDATER_FAMILY_ID_INDEX.get(self.updater_family_id)
 
 	def is_compatible_with(self, target: iPodTarget) -> bool:
+		"""Determine if this update is compatible with the given target"""
 		return self.get_target_device().is_compatible_with(target)
 
 	def get_pretty_version_name(self):
+		"""Return a pretty string containing the version numbers of this update"""
 		version_part = self.product_version or numeric_build_id_to_string(self.visible_build_id)
 		detailed_version_part = self.build_version or numeric_build_id_to_string(self.build_id)
 		return f"{version_part} ({detailed_version_part})"
@@ -69,9 +87,13 @@ class AvailableSoftwareUpdate(BaseAvailableSoftware):
 
 @dataclass(kw_only=True, frozen=True)
 class AvailableRecoverySoftware(BaseAvailableSoftware):
+	"""Represents an available recovery software for an iPod."""
 	usb_pid: int
+	"""USB product ID that this firmware is applicable to"""
 	build_version: Optional[str]
+	"""Internal build version of this firmware"""
 	firmware_url: str
+	"""URL referencing the IPSW containing this firmware"""
 
 	def _version_as_tuple(self):
 		if "." in self.build_version:
@@ -80,6 +102,7 @@ class AvailableRecoverySoftware(BaseAvailableSoftware):
 			return (int(self.build_version[3:]), )
 
 	def get_target_device(self) -> iPodTarget:
+		"""Return the target device that this recovery software is applicable to"""
 		return USB_PID_INDEX[self.usb_pid]
 
 	def __repr__(self):
@@ -88,17 +111,25 @@ class AvailableRecoverySoftware(BaseAvailableSoftware):
 
 @dataclass(kw_only=True)
 class AvailableUpdates:
+	"""Container for a bunch of available updates and recovery software for iPods."""
 	recovery_software: set[AvailableRecoverySoftware]
+	"""Set of available recovery software"""
 	software_updates: set[AvailableSoftwareUpdate]
+	"""Set of available software updates"""
 
 	def extend_with(self, other: AvailableUpdates):
+		"""Extend this object with data from another AvailableUpdates object."""
 		self.recovery_software.update(other.recovery_software)
 		self.software_updates.update(other.software_updates)
 
 	@classmethod
 	def from_phobos_plist(cls, plist_data: str | bytes, *, fix_urls: bool = True):
 		"""
-		Create an AvailableUpdates instance from Apple Phobos data in plist format
+		Constructs an AvailableUpdates instance from Apple Phobos data in plist format
+
+		Parameters:
+			plist_data: Phobos data in plist format
+			fix_urls: Whether to modify all URLs, placing them all in the `https` scheme
 		"""
 		data = plistlib.loads(plist_data)
 
@@ -155,6 +186,7 @@ class AvailableUpdates:
 		)
 
 	def recovery_software_by_usb_pid(self) -> dict[int, list[AvailableRecoverySoftware]]:
+		"""Return a mapping of USB product IDs to available recovery software."""
 		result = {}
 
 		for update in self.recovery_software:
@@ -171,6 +203,7 @@ class AvailableUpdates:
 		return result
 
 	def software_updates_by_updater_family_id(self) -> dict[int, list[AvailableSoftwareUpdate]]:
+		"""Return a mapping of updater family IDs to available software updates."""
 		result = {}
 
 		for update in self.software_updates:
@@ -188,18 +221,18 @@ class AvailableUpdates:
 
 
 def fix_appldnld_url(phobos_url: str):
-	"""Fix an appldnld CDN URL by updating host and changing the scheme to https """
+	"""Fix an appldnld CDN URL by updating its host and changing the scheme to `https`."""
 	url = urlsplit(phobos_url)
 
-	if url.hostname == EDGESUITE_DNLD_HOST:
+	if url.hostname == _EDGESUITE_DNLD_HOST:
 		path = "/" + "/".join(url.path.split("/")[2:])
-	elif url.hostname in {HTTP_DNLD_HOST, HTTPS_DNLD_HOST}:
+	elif url.hostname in {_HTTP_DNLD_HOST, _HTTPS_DNLD_HOST}:
 		path = url.path
 	else:
 		raise ValueError("Invalid URL")
 
 	return urlunsplit((
-		"https", HTTPS_DNLD_HOST, path, url.query, url.fragment
+		"https", _HTTPS_DNLD_HOST, path, url.query, url.fragment
 	))
 
 
@@ -253,3 +286,4 @@ HISTORICAL_AVAILABLE_UPDATES = AvailableUpdates(
 		AvailableSoftwareUpdate(39, None, None, "1.1.2", "39A10023", "https://secure-appldnld.apple.com/ipod/sbml/osx/bundles/031-59796-20160525-8E6A5D46-21FF-11E6-89D1-C5D3662719FC/iPod_1.1.2_39A10023.ipsw", "https://secure-appldnld.apple.com/ipod/sbml/osx/bundles/031-59796-20160525-8E6A5D46-21FF-11E6-89D1-C5D3662719FC/iPodDocumentation_1.1.2_39A10023.ipd")
 	}
 )
+"""Preset instance of AvailableUpdates containing historically available software updates for various iPods."""

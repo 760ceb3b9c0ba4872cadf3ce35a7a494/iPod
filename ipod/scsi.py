@@ -1,6 +1,7 @@
 """
-implementation of a subset of SCSI CDB with Apple iPodSubcommand extensions
-Actual sending is platform-specific, see platforms
+implementation of a subset of the Small Computer System Interface (SCSI) protocol,
+with support for proprietary Apple iPod subcommands.
+Actual SCSI sending is platform-specific and is not implemented here.
 """
 
 import io
@@ -9,6 +10,7 @@ from enum import Enum, IntEnum
 
 
 class DataTransferDirection(Enum):
+	"""Direction of SCSI data transfer."""
 	NONE = "none"
 	TO_DEVICE = "to_device"
 	FROM_DEVICE = "from_device"
@@ -16,6 +18,7 @@ class DataTransferDirection(Enum):
 
 
 class iPodSubcommand(IntEnum):
+	"""Enumerates proprietary iPod subcommands"""
 	# i refuse to call it "IPodSubcommand"
 	UPDATE_START = 0x90
 	UPDATE_CHUNK = 0x91
@@ -26,8 +29,11 @@ class iPodSubcommand(IntEnum):
 
 
 class OperationCode(IntEnum):
-	# only some operation codes are implemented here
-	# see https://www.t10.org/lists/op-num.htm
+	"""
+	Enumerates a subset of SCSI operation codes.
+	Only some operation codes are implemented here, see https://www.t10.org/lists/op-num.htm
+	for a complete list.
+	"""
 
 	# group 0 - six-byte commands (00 to 1F)
 	INQUIRY = 0x12
@@ -47,25 +53,30 @@ class OperationCode(IntEnum):
 
 @dataclass()
 class CommandDataBuffer:
+	"""A SCSI command data buffer (CDB)"""
 	operation_code: int
+	"""SCSI operation code."""
 
-	request: bytes  # Request contains the OperationCode-specific request parameters
+	request: bytes
+	"""OperationCode-specific request parameters"""
 
-	# ServiceAction can (for certain CDB encodings) contain an additional
-	# qualification for the OperationCode.
 	service_action: int = None
+	"""for certain CDB encodings, contains an additional qualification for the OperationCode."""
 
-	# Control contains common CDB metadata
 	control: int = 0
+	"""contains common CDB metadata"""
 
-	# DataTransferDirection contains the direction(s) of the data transfer(s)
-	# to be made.
 	data_transfer_direction: DataTransferDirection = DataTransferDirection.NONE
+	"""direction(s) of data transfer"""
 
 	outgoing_data: bytes = None  # important difference!
+	"""outgoing data, when `data_transfer_direction` is `TO_DEVICE` or `BIDIRECTIONAL`."""
+
 	incoming_data_length: int = 0  # also important as wel
+	"""length of incoming data, when `data_transfer_direction` is `FROM_DEVICE` or `BIDIRECTIONAL`."""
 
 	def to_bytes(self) -> bytes:
+		"""Convert this CDB to bytes"""
 		if 0x00 <= self.operation_code < 0x20:
 			# group 0 - six-byte commands (00 to 1F)
 			if self.service_action is not None:
@@ -179,6 +190,14 @@ class CommandDataBuffer:
 
 
 def create_inquiry_vital_product_data(page_code: int, allocation_length: int) -> CommandDataBuffer:
+	"""
+	Build a SCSI INQUIRY Vital Product Data (VPD) CDB.
+
+	Parameters:
+		page_code: Page code of data to request
+		allocation_length: Length of data to request
+	"""
+
 	buffer = io.BytesIO()
 	# "When the EVPD bit is set to one, the PAGE CODE field specifies which page of vital product data information the device server shall return"
 	buffer.write(0b00000001.to_bytes(1, "big"))

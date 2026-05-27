@@ -101,4 +101,5 @@ def macOS_get_mount_point(serial_number: str):
 
 
 def numeric_build_id_to_string(build_id: int):
+	"""Convert a numeric build ID to a string"""
 	return f"{build_id >> 24 & 0b1111}.{build_id >> 20 & 0b1111}.{build_id >> 16 & 0b1111}"

@@ -1,5 +1,6 @@
 """
-implementation of a subset of the Device Firmware Update (DFU) protocol
+Implementation of a subset of the Device Firmware Update (DFU) protocol based on pyusb.
+The specification is available here: https://www.usb.org/sites/default/files/DFU_1.1.pdf
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ _DEFAULT_TIMEOUT_MS = 5000
 
 
 class DFUDeviceStatus(IntEnum):
+	"""Enumerates the statuses of a DFU device."""
 	OK = 0x00
 	ERROR_TARGET = 0x01
 	ERROR_FILE = 0x02
@@ -35,7 +37,7 @@ class DFUDeviceStatus(IntEnum):
 
 
 class DFUDeviceState(IntEnum):
-	# https://www.usb.org/sites/default/files/DFU_1.1.pdf
+	"""Enumerates the possible states of a DFU device."""
 	APP_IDLE = 0x00
 	APP_DETACH = 0x01
 	IDLE = 0x02
@@ -50,6 +52,7 @@ class DFUDeviceState(IntEnum):
 
 
 class DFUCommand(IntEnum):
+	"""Enumerates the types of DFU commands."""
 	DETACH = 0
 	DOWNLOAD = 1
 	GET_STATUS = 3
@@ -59,12 +62,14 @@ class DFUCommand(IntEnum):
 
 
 class USBRequestType(IntEnum):
+	"""Enumerates USB `bmRequestType`s."""
 	SEND = 0x21
 	RECEIVE = 0xA1
 
 
 @dataclass
 class DFUDeviceStatusPayload:
+	"""Represents the status of a DFU device"""
 	status: DFUDeviceStatus
 	poll_timeout: int
 	state: DFUDeviceState
@@ -81,12 +86,19 @@ class DFUDeviceStatusPayload:
 
 
 class DFUDevice:
+	"""
+	Represents a USB DFU device.
+	"""
 	def __init__(self, device: usb.core.Device, interface: int = 0, *, timeout_ms: int = _DEFAULT_TIMEOUT_MS):
-		self.device = device
-		self.interface = interface
-		self.timeout_ms = timeout_ms
+		self.device: usb.core.Device = device
+		"""Underlying pyusb device"""
+		self.interface: int = interface
+		"""USB interface number, passed to `wIndex`"""
+		self.timeout_ms: int = timeout_ms
+		"""Control transfer timeout in milliseconds"""
 
 	def get_status(self) -> DFUDeviceStatusPayload:
+		"""Return the current status of the device"""
 		data = self.device.ctrl_transfer(
 			bmRequestType=USBRequestType.RECEIVE,
 			bRequest=DFUCommand.GET_STATUS,
@@ -99,6 +111,7 @@ class DFUDevice:
 		return DFUDeviceStatusPayload.from_stream(io.BytesIO(data))
 
 	def clear_status(self):
+		"""Clear the status of the device"""
 		self.device.ctrl_transfer(
 			bmRequestType=USBRequestType.SEND,
 			bRequest=DFUCommand.CLEAR_STATUS,
@@ -109,6 +122,13 @@ class DFUDevice:
 		)
 
 	def download(self, block_number: int, data: bytes | None):
+		"""
+		Send one block of data to the device.
+
+		Parameters:
+			block_number: Block number
+			data: Block data, or `None` to end download.
+		"""
 		# pass data=None to end download
 		self.device.ctrl_transfer(
 			bmRequestType=USBRequestType.SEND,
@@ -122,7 +142,9 @@ class DFUDevice:
 		)
 
 	def claim_interface(self):
+		"""Claim the USB interface."""
 		usb.util.claim_interface(self.device, self.interface)
 
 	def release_interface(self):
+		"""Release the USB interface."""
 		usb.util.release_interface(self.device, self.interface)

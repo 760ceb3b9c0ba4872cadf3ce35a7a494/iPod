@@ -1,3 +1,7 @@
+"""
+Implementation of the Apple 11- and 12-character serial number format.
+"""
+
 from __future__ import annotations
 
 import datetime
@@ -13,15 +17,24 @@ class InvalidSerialNumber(ValueError):
 
 @dataclass
 class SerialNumber:
-	# https://beetstech.com/blog/decode-meaning-behind-apple-serial-number
-	location_code: str  # 3 chars
-	manufacturing_year: int  # 2010-2019
-	manufacturing_week: int  # 1-53
-	identifier: str  # 3 chars
-	config_code: str  # 4 chars identifying the model
+	"""
+	Represents an Apple serial number.
+	Technical details: https://beetstech.com/blog/decode-meaning-behind-apple-serial-number
+	"""
+	location_code: str
+	"""3-character location code of the place of manufacture."""
+	manufacturing_year: int
+	"""Year of manufacture"""
+	manufacturing_week: int
+	"""Week number of the date of manufacture"""
+	identifier: str
+	"""Random 3-character code uniquely identifying a device"""
+	config_code: str
+	"""4-character configuration code identifying the model of device"""
 
 	@classmethod
 	def from_serial(cls, serial: str) -> SerialNumber:
+		"""Parse a serial, returning a new SerialNumber."""
 		if len(serial) == 12:
 			# 2010- serial format
 			half_year = _YEAR_ALPHABET.index(serial[3])
@@ -49,7 +62,8 @@ class SerialNumber:
 			config_code=serial[8:12]
 		)
 
-	def to_serial(self):
+	def to_serial(self) -> str:
+		"""Turn this SerialNumber back to a string."""
 		# fixme: always creates 2010 serials
 		base_year = (self.manufacturing_year - 2010)
 		half_year = base_year * 2
@@ -69,7 +83,7 @@ class SerialNumber:
 
 
 def calculate_week_start_and_end_dates(year: int, week: int):
-	"""Utility to turn a week and year to the monday and sunday dates of that week"""
+	"""Utility to turn a week and year to the monday and sunday dates of that week."""
 	monday_date = datetime.datetime.strptime(f"{year}-W{week}-1", "%Y-W%W-%w")
 	friday_date = monday_date + datetime.timedelta(days=6)
 	return monday_date, friday_date

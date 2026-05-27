@@ -7,9 +7,7 @@ from ..scsi import CommandDataBuffer, create_inquiry_vital_product_data
 
 
 class BaseSCSIDevice:
-	"""
-	this is an abstract class representing a SCSI device that can take a SCSI command
-	"""
+	"""Abstract base class representing a SCSI device that can take a SCSI command"""
 
 	def raw_command(self, cdb: CommandDataBuffer) -> bytes | None: ...
 
@@ -30,12 +28,15 @@ class BaseSCSIDevice:
 
 @dataclass
 class ConnectedDevice:
+	"""Represents a connected iPod device"""
 	id: str
 	serial: str
 	target: iPodTarget
 
 
 class BaseUSBProvider:
+	"""Abstract base class representing a USB provider"""
+
 	def list_connected_devices(self) -> Iterable[ConnectedDevice]: ...
 
 	def get_connected_device(self, device_id: str) -> ConnectedDevice | None: ...

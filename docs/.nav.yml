@@ -1,0 +1,5 @@
+preserve_directory_names: true
+
+nav:
+  - "*"
+  - API Reference: reference

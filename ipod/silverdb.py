@@ -908,7 +908,7 @@ class SilverDB:
 		try:
 			return next(iter(section for section in self.sections if section.type == section_type))
 		except StopIteration:
-			raise KeyError(f"SilverDB does not contain section {section_type!r}")
+			raise ValueError(f"SilverDB does not contain section {section_type!r}")
 
 	@classmethod
 	def from_stream(cls, stream: BinaryIO):
@@ -921,48 +921,50 @@ class SilverDB:
 		header_length = int.from_bytes(stream.read(4), "little")
 		section_count = int.from_bytes(stream.read(4), "little")
 
+		# parse all the section headers
 		section_headers: list[_SilverDBSectionHeader] = []
 		for i in range(section_count):
 			section_headers.append(_SilverDBSectionHeader.from_stream(stream))
 
-		sections_resources: dict[str, tuple[_SilverDBResourceHeader, ...]] = {}
-
+		# parse all the resource headers
+		sections_resource_headers: dict[str, tuple[_SilverDBResourceHeader, ...]] = {}
 		for section_header in section_headers:
-			if section_header.type in sections_resources:
+			if section_header.type in sections_resource_headers:
 				raise ValueError("duplicate table")
 			assert section_header.jumpy == _SECTION_IS_JUMPY[section_header.type]
 			stream.seek(start + section_header.offset)
-			sections_resources[section_header.type] = tuple((
+			sections_resource_headers[section_header.type] = tuple((
 				_SilverDBResourceHeader.from_stream(stream)
 				for _ in range(section_header.resource_count)
 			))
 
+		# sanity check: make sure we're in the right place
 		misalignment = header_length - (stream.tell() - start)
 		if misalignment > 4:
 			# some SilverDBs seem to pad this offset out with some null bytes, which means misalignment=4
 			raise ValueError("parse error")
 
+		# now create the final sections
 		sections = []
-
-		for section_type, resource_headers in sections_resources.items():
+		for section_type, resource_headers in sections_resource_headers.items():
 			section_resource_class = _SECTION_TO_RESOURCE_TYPE.get(section_type, RawResource)
-			end_resources = []
+
+			resources = []
 			for resource_header in resource_headers:
-				# print(f"{section_type} {resource_header.id} {resource_header.offset} {resource_header.length}")
-				stream.seek(start + header_length + resource_header.offset)
-				end_resources.append(section_resource_class.from_stream(
+				stream.seek(start + header_length + resource_header.offset)  # seek to the resource
+				resources.append(section_resource_class.from_stream(
 					id=resource_header.id,
 					stream=stream,
 					length=resource_header.length
 				))
+
 			sections.append(SilverDBSection(
 				type=section_type,
-				resources=end_resources
+				resources=resources
 			))
 
-		return cls(
-			sections=sections
-		)
+		# all done :3
+		return cls(sections=sections)
 
 	def to_stream(self, stream: BinaryIO):
 		"""Save the SilverDB to the given stream."""
@@ -980,7 +982,8 @@ class SilverDB:
 		section_headers: dict[str, _SilverDBSectionHeader] = {}
 		section_resource_headers: dict[str, list[_SilverDBResourceHeader]] = {}
 
-		for i, section in enumerate(self.sections):
+		# write all resources, creating the section and resource headers
+		for _, section in enumerate(self.sections):
 			section_header = _SilverDBSectionHeader(
 				type=section.type,
 				resource_count=len(section.resources),
@@ -990,9 +993,10 @@ class SilverDB:
 			section_headers[section.type] = section_header
 
 			resource_headers = []
-			for j, resource in enumerate(section.resources):
+			for _, resource in enumerate(section.resources):
+				# write the resource:
 				resource_offset = stream.tell()
-				resource.to_stream(stream)
+				resource.to_stream(stream)  # <- write it
 				resource_end_offset = stream.tell()
 				resource_length = resource_end_offset - resource_offset
 
@@ -1001,12 +1005,17 @@ class SilverDB:
 					offset=resource_offset - start - header_length,
 					length=resource_length
 				))
+
+				# pad to 4 bytes:
 				misalignment = (stream.tell() - start) % 4
 				if misalignment > 0:
 					stream.write(bytes(4 - misalignment))
 
 			section_resource_headers[section.type] = resource_headers
 
+		end_offset = stream.tell()
+
+		# seek back to write all resource headers, and update section headers with the offsets
 		stream.seek(start + 12 + section_headers_length)
 		for section_type, resource_headers in section_resource_headers.items():
 			section_resource_headers_start = stream.tell()
@@ -1014,10 +1023,13 @@ class SilverDB:
 			section_header.offset = section_resource_headers_start - start
 
 			for resource_header in resource_headers:
-				# print(f"{section_type} {resource_header.id} {resource_header.offset} {resource_header.length}")
 				resource_header.to_stream(stream)
 
+		# finally, seek to the start to write all the section headers
 		stream.seek(start + 12)
 		for section_header in section_headers.values():
-			# print(f"{section_header.type} {section_header.offset}")
 			section_header.to_stream(stream)
+
+		# go back to the end
+		stream.seek(end_offset)
+		# all done :3

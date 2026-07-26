@@ -1,0 +1,3226 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../mse/">
+      
+      
+        <link rel="next" href="../plist/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>phobos - iPod for Python</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ipod.phobos" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="iPod for Python" class="md-header__button md-logo" aria-label="iPod for Python" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm0 2h10v6H7zm5 8a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 2a2 2 0 0 0-2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0-2-2"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            iPod for Python
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              phobos
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="blue"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/760ceb3b9c0ba4872cadf3ce35a7a494/iPod" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    iPod
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="iPod for Python" class="md-nav__button md-logo" aria-label="iPod for Python" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm0 2h10v6H7zm5 8a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 2a2 2 0 0 0-2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0-2-2"/></svg>
+
+    </a>
+    iPod for Python
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/760ceb3b9c0ba4872cadf3ce35a7a494/iPod" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    iPod
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    iPod
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ipod
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ipod
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    cli
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../definitions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    definitions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../device/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    device
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dfu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    dfu
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../img1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    img1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ipsw/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ipsw
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    mse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    phobos
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    phobos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.APPLE_PHOBOS_URL" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;APPLE_PHOBOS_URL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.HISTORICAL_AVAILABLE_UPDATES" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;HISTORICAL_AVAILABLE_UPDATES
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.BaseAvailableSoftware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;BaseAvailableSoftware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" BaseAvailableSoftware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.BaseAvailableSoftware.get_target_device" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_target_device
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.BaseAvailableSoftware.__gt__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__gt__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;AvailableSoftwareUpdate
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" AvailableSoftwareUpdate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.updater_family_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;updater_family_id
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.build_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;build_id
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.visible_build_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;visible_build_id
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.product_version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;product_version
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.build_version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;build_version
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.firmware_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;firmware_url
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.documentation_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;documentation_url
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.get_target_device" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_target_device
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.is_compatible_with" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;is_compatible_with
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.get_pretty_version_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_pretty_version_name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.__repr__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__repr__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.__gt__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__gt__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;AvailableRecoverySoftware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" AvailableRecoverySoftware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware.usb_pid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;usb_pid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware.build_version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;build_version
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware.firmware_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;firmware_url
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware.get_target_device" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_target_device
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware.__repr__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__repr__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware.__gt__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__gt__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;AvailableUpdates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" AvailableUpdates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.recovery_software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;recovery_software
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.software_updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;software_updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.extend_with" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;extend_with
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.from_phobos_plist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;from_phobos_plist
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" from_phobos_plist">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.from_phobos_plist(plist_data)" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;plist_data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.from_phobos_plist(fix_urls)" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;fix_urls
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.recovery_software_by_usb_pid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;recovery_software_by_usb_pid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.software_updates_by_updater_family_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;software_updates_by_updater_family_id
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.fix_appldnld_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;fix_appldnld_url
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plist/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    plist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scsi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    scsi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serial_number/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    serial_number
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sun/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sun
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    utils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1_14" id="__nav_2_1_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    platforms
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    platforms
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../platforms/base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    base
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../platforms/pyusb_provider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pyusb_provider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../platforms/sgutils_provider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sgutils_provider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../platforms/win32_provider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    win32_provider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../platforms/win32_scsiio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    win32_scsiio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.APPLE_PHOBOS_URL" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;APPLE_PHOBOS_URL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.HISTORICAL_AVAILABLE_UPDATES" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;HISTORICAL_AVAILABLE_UPDATES
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.BaseAvailableSoftware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;BaseAvailableSoftware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" BaseAvailableSoftware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.BaseAvailableSoftware.get_target_device" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_target_device
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.BaseAvailableSoftware.__gt__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__gt__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;AvailableSoftwareUpdate
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" AvailableSoftwareUpdate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.updater_family_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;updater_family_id
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.build_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;build_id
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.visible_build_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;visible_build_id
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.product_version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;product_version
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.build_version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;build_version
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.firmware_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;firmware_url
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.documentation_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;documentation_url
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.get_target_device" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_target_device
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.is_compatible_with" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;is_compatible_with
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.get_pretty_version_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_pretty_version_name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.__repr__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__repr__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableSoftwareUpdate.__gt__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__gt__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;AvailableRecoverySoftware
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" AvailableRecoverySoftware">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware.usb_pid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;usb_pid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware.build_version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;build_version
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware.firmware_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;firmware_url
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware.get_target_device" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_target_device
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware.__repr__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__repr__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableRecoverySoftware.__gt__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;__gt__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;AvailableUpdates
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" AvailableUpdates">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.recovery_software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;recovery_software
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.software_updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;software_updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.extend_with" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;extend_with
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.from_phobos_plist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;from_phobos_plist
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" from_phobos_plist">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.from_phobos_plist(plist_data)" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;plist_data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.from_phobos_plist(fix_urls)" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-parameter"></code>&nbsp;fix_urls
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.recovery_software_by_usb_pid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;recovery_software_by_usb_pid
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ipod.phobos.AvailableUpdates.software_updates_by_updater_family_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;software_updates_by_updater_family_id
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipod.phobos.fix_appldnld_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;fix_appldnld_url
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h1 id="ipod.phobos" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">phobos</span>
+
+
+</h1>
+
+    <div class="doc doc-contents first">
+
+        <p>iPod-specific implementation of Apple's Phobos system for downloading firmware updates for devices,
+as well as implementations of more general software update stuff.</p>
+
+          
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="ipod.phobos.APPLE_PHOBOS_URL" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">APPLE_PHOBOS_URL</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">APPLE_PHOBOS_URL</span> <span class="o">=</span> <span class="s1">&#39;https://itunes.apple.com/WebObjects/MZStore.woa/wa/com.apple.jingle.appserver.client.MZITunesClientCheck/version&#39;</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Apple iTunes Phobos lookup endpoint URL</p>
+
+          
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="ipod.phobos.HISTORICAL_AVAILABLE_UPDATES" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">HISTORICAL_AVAILABLE_UPDATES</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">HISTORICAL_AVAILABLE_UPDATES</span> <span class="o">=</span> <span class="n">AvailableUpdates</span><span class="p">(</span><span class="n">recovery_software</span><span class="o">=</span><span class="nb">set</span><span class="p">(),</span> <span class="n">software_updates</span><span class="o">=</span><span class="p">{</span><span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">151224320</span><span class="p">,</span> <span class="mi">17006592</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-3940.20071115.0Iun5/iPod_24.1.0.3.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-3940.20071115.0Iun5/iPodDocumentation_24.1.0.3.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">152076288</span><span class="p">,</span> <span class="mi">17858560</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4010.20080115.Ad4rF/iPod_24.1.1.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4010.20080115.Ad4rF/iPodDocumentation_24.1.1.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">152207360</span><span class="p">,</span> <span class="mi">17989632</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4306.20080430.Gtr54/iPod_24.1.1.2.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4306.20080430.Gtr54/iPodDocumentation_24.1.1.2.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">152141824</span><span class="p">,</span> <span class="mi">17924096</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4275.20080206.PdpOd/iPod_24.1.1.1.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4275.20080206.PdpOd/iPodDocumentation_24.1.1.1.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">152207360</span><span class="p">,</span> <span class="mi">17989632</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4306.20080430.Gtr54/iPod_24.1.1.2.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4306.20080430.Gtr54/iPodDocumentation_24.1.1.2.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="mi">151027712</span><span class="p">,</span> <span class="mi">33587200</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4962.20080909.Aaqs3/iPod_33.2.0.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4962.20080909.Aaqs3/iPodDocumentation_33.2.0.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="mi">151093248</span><span class="p">,</span> <span class="mi">33652736</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-5740.20081111.ZaU7Y/iPod_33.2.0.1.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-5740.20081111.ZaU7Y/iPodDocumentation_33.2.0.1.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">151158784</span><span class="p">,</span> <span class="mi">33718272</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-6797.20090909.3uTfE/iPod_35.2.0.2.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-6797.20090909.3uTfE/iPodDocumentation_35.2.0.2.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">151224320</span><span class="p">,</span> <span class="mi">33783808</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-7155.20090925.Ju879/iPod_35.2.0.3.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-7155.20090925.Ju879/iPodDocumentation_35.2.0.3.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">151289856</span><span class="p">,</span> <span class="mi">33849344</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-7299.20091217.Bghyt/iPod_35.2.0.4.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-7299.20091217.Bghyt/iPodDocumentation_35.2.0.4.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">38</span><span class="p">,</span> <span class="mi">151355392</span><span class="p">,</span> <span class="mi">33914880</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/041-8552.20121203.Bile3/iPod_38.2.0.5.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/041-8552.20121203.Bile3/iPodDocumentation_38.2.0.5.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span> <span class="mi">151158784</span><span class="p">,</span> <span class="mi">16941056</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-3930.20071005.94rVg/iPod_26.1.0.2.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-3930.20071005.94rVg/iPodDocumentation_26.1.0.2.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span> <span class="mi">167804928</span><span class="p">,</span> <span class="mi">16809984</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4637.20080909.vfH8i/iPod_31.1.0.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-4637.20080909.vfH8i/iPodDocumentation_31.1.0.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span> <span class="mi">167936000</span><span class="p">,</span> <span class="mi">16941056</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-5529.20080915.3ngi4/iPod_31.1.0.2.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-5529.20080915.3ngi4/iPodDocumentation_31.1.0.2.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span> <span class="mi">168001536</span><span class="p">,</span> <span class="mi">17006592</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-5583.20081111.Bhyui/iPod_31.1.0.3.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-5583.20081111.Bhyui/iPodDocumentation_31.1.0.3.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span> <span class="mi">168067072</span><span class="p">,</span> <span class="mi">17072128</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-5808.20090805.Fvgtr/iPod_31.1.0.4.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-5808.20090805.Fvgtr/iPodDocumentation_31.1.0.4.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">34</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;1.0.1&#39;</span><span class="p">,</span> <span class="s1">&#39;34A10006&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-7165.20090909.AzPKm/iPod_1.0.1_34A10006.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-7165.20090909.AzPKm/iPodDocumentation_1.0.1_34A10006.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">34</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;1.0.2&#39;</span><span class="p">,</span> <span class="s1">&#39;34A20020&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-7408.20091109.Kef5t/iPod_1.0.2_34A20020.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-7408.20091109.Kef5t/iPodDocumentation_1.0.2_34A20020.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">36</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;1.0&#39;</span><span class="p">,</span> <span class="s1">&#39;36A00403&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-9054.20100907.VKPt5/iPod_1.0_36A00403.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-9054.20100907.VKPt5/iPodDocumentation_1.0_36A00403.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">36</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;1.1&#39;</span><span class="p">,</span> <span class="s1">&#39;36B00109&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-9358.20110221.9a5fF/iPod_1.1_36B00109.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/061-9358.20110221.9a5fF/iPodDocumentation_1.1_36B00109.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">36</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;1.2&#39;</span><span class="p">,</span> <span class="s1">&#39;36B10147&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/041-1920.20111004.CpeEw/iPod_1.2_36B10147.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/041-1920.20111004.CpeEw/iPodDocumentation_1.2_36B10147.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">37</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;1.0.2&#39;</span><span class="p">,</span> <span class="s1">&#39;37A20067&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/041-7265.20121212.WnBg0/iPod_1.0.2_37A20067.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/041-7265.20121212.WnBg0/iPodDocumentation_1.0.2_37A20067.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">37</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;1.0.3&#39;</span><span class="p">,</span> <span class="s1">&#39;37A30172&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/041-9962.20131211.Aqaqa/iPod_1.0.3_37A30172.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/041-9962.20131211.Aqaqa/iPodDocumentation_1.0.3_37A30172.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">37</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;1.0.4&#39;</span><span class="p">,</span> <span class="s1">&#39;37A40005&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/031-26260-201500810-D2BC269E-3FBC-11E5-885A-067B3A53DB92/iPod_1.0.4_37A40005.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/iPod/SBML/osx/bundles/031-26260-201500810-D2BC269E-3FBC-11E5-885A-067B3A53DB92/iPodDocumentation_1.0.4_37A40005.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">39</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;1.1.1&#39;</span><span class="p">,</span> <span class="s1">&#39;39A00025&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/ipod/sbml/osx/bundles/031-25237-20150715-D737390E-1C1F-11E5-9274-0ACEBE268FF7/iPod_1.1.1_39A00025.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/ipod/sbml/osx/bundles/031-25237-20150715-D737390E-1C1F-11E5-9274-0ACEBE268FF7/iPodDocumentation_1.1.1_39A00025.ipd&#39;</span><span class="p">),</span> <span class="n">AvailableSoftwareUpdate</span><span class="p">(</span><span class="mi">39</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;1.1.2&#39;</span><span class="p">,</span> <span class="s1">&#39;39A10023&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/ipod/sbml/osx/bundles/031-59796-20160525-8E6A5D46-21FF-11E6-89D1-C5D3662719FC/iPod_1.1.2_39A10023.ipsw&#39;</span><span class="p">,</span> <span class="s1">&#39;https://secure-appldnld.apple.com/ipod/sbml/osx/bundles/031-59796-20160525-8E6A5D46-21FF-11E6-89D1-C5D3662719FC/iPodDocumentation_1.1.2_39A10023.ipd&#39;</span><span class="p">)})</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Preset instance of AvailableUpdates containing historically available software updates for various iPods.</p>
+
+          
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ipod.phobos.BaseAvailableSoftware" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">BaseAvailableSoftware</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+          
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.BaseAvailableSoftware.get_target_device" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_target_device</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_target_device</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">iPodTarget</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">25</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_target_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">iPodTarget</span><span class="p">:</span> <span class="o">...</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.BaseAvailableSoftware.__gt__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__gt__</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">__gt__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+	<span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_target_device</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version_as_tuple</span><span class="p">())</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">get_target_device</span><span class="p">(),</span> <span class="n">other</span><span class="o">.</span><span class="n">_version_as_tuple</span><span class="p">())</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ipod.phobos.AvailableSoftwareUpdate" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">AvailableSoftwareUpdate</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">AvailableSoftwareUpdate</span><span class="p">(</span><span class="n">updater_family_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">build_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">visible_build_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">product_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">build_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">firmware_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">documentation_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Represents an available software update for an iPod.</p>
+
+          
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ipod.phobos.AvailableSoftwareUpdate.updater_family_id" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">updater_family_id</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">updater_family_id</span><span class="p">:</span> <span class="nb">int</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Updater family ID targeted by this update</p>
+
+          
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ipod.phobos.AvailableSoftwareUpdate.build_id" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">build_id</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">build_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Internal build ID of this update</p>
+
+          
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ipod.phobos.AvailableSoftwareUpdate.visible_build_id" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">visible_build_id</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">visible_build_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>User-facing build ID of this update</p>
+
+          
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ipod.phobos.AvailableSoftwareUpdate.product_version" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">product_version</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">product_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>User-facing version of this update</p>
+
+          
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ipod.phobos.AvailableSoftwareUpdate.build_version" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">build_version</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">build_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Internal build version of this update</p>
+
+          
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ipod.phobos.AvailableSoftwareUpdate.firmware_url" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">firmware_url</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">firmware_url</span><span class="p">:</span> <span class="nb">str</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>URL referencing the IPSW for this update</p>
+
+          
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ipod.phobos.AvailableSoftwareUpdate.documentation_url" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">documentation_url</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">documentation_url</span><span class="p">:</span> <span class="nb">str</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>URL referencing the IPD-format documentation for this update (a ZIP file containing RTF files)</p>
+
+          
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.AvailableSoftwareUpdate.get_target_device" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_target_device</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_target_device</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">iPodTarget</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the target device that this update is applicable to</p>
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_target_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">iPodTarget</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Return the target device that this update is applicable to&quot;&quot;&quot;</span>
+	<span class="k">return</span> <span class="n">UPDATER_FAMILY_ID_INDEX</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updater_family_id</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.AvailableSoftwareUpdate.is_compatible_with" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">is_compatible_with</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">is_compatible_with</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="n">iPodTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Determine if this update is compatible with the given target</p>
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_compatible_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">iPodTarget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Determine if this update is compatible with the given target&quot;&quot;&quot;</span>
+	<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_target_device</span><span class="p">()</span><span class="o">.</span><span class="n">is_compatible_with</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.AvailableSoftwareUpdate.get_pretty_version_name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_pretty_version_name</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_pretty_version_name</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return a pretty string containing the version numbers of this update</p>
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_pretty_version_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Return a pretty string containing the version numbers of this update&quot;&quot;&quot;</span>
+	<span class="n">version_part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">product_version</span> <span class="ow">or</span> <span class="n">numeric_build_id_to_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">visible_build_id</span><span class="p">)</span>
+	<span class="n">detailed_version_part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_version</span> <span class="ow">or</span> <span class="n">numeric_build_id_to_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_id</span><span class="p">)</span>
+	<span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">version_part</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">detailed_version_part</span><span class="si">}</span><span class="s2">)&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.AvailableSoftwareUpdate.__repr__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__repr__</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">__repr__</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+	<span class="k">try</span><span class="p">:</span>
+		<span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_target_device</span><span class="p">()</span>
+	<span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+		<span class="n">target</span> <span class="o">=</span> <span class="kc">None</span>
+
+	<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">product_version</span><span class="p">:</span>
+		<span class="n">version</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">product_version</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">build_version</span><span class="si">}</span><span class="s2">)&quot;</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">version</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">numeric_build_id_to_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">visible_build_id</span><span class="p">)</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">numeric_build_id_to_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_id</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+	<span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_version_as_tuple</span><span class="p">()</span><span class="si">}</span><span class="s2"> &lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">get_pretty_model_name</span><span class="p">()</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;unknown iPod&#39;</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.AvailableSoftwareUpdate.__gt__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__gt__</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">__gt__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+	<span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_target_device</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version_as_tuple</span><span class="p">())</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">get_target_device</span><span class="p">(),</span> <span class="n">other</span><span class="o">.</span><span class="n">_version_as_tuple</span><span class="p">())</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ipod.phobos.AvailableRecoverySoftware" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">AvailableRecoverySoftware</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">AvailableRecoverySoftware</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">usb_pid</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">build_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">firmware_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Represents an available recovery software for an iPod.</p>
+
+          
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ipod.phobos.AvailableRecoverySoftware.usb_pid" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">usb_pid</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">usb_pid</span><span class="p">:</span> <span class="nb">int</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>USB product ID that this firmware is applicable to</p>
+
+          
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ipod.phobos.AvailableRecoverySoftware.build_version" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">build_version</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">build_version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Internal build version of this firmware</p>
+
+          
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ipod.phobos.AvailableRecoverySoftware.firmware_url" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">firmware_url</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">firmware_url</span><span class="p">:</span> <span class="nb">str</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>URL referencing the IPSW containing this firmware</p>
+
+          
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.AvailableRecoverySoftware.get_target_device" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_target_device</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_target_device</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">iPodTarget</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the target device that this recovery software is applicable to</p>
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_target_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">iPodTarget</span><span class="p">:</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Return the target device that this recovery software is applicable to&quot;&quot;&quot;</span>
+	<span class="k">return</span> <span class="n">USB_PID_INDEX</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">usb_pid</span><span class="p">]</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.AvailableRecoverySoftware.__repr__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__repr__</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">__repr__</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">108</span>
+<span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+	<span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">build_version</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_target_device</span><span class="p">()</span><span class="o">.</span><span class="n">get_pretty_name</span><span class="p">()</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.AvailableRecoverySoftware.__gt__" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">__gt__</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">__gt__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+	<span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_target_device</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version_as_tuple</span><span class="p">())</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">get_target_device</span><span class="p">(),</span> <span class="n">other</span><span class="o">.</span><span class="n">_version_as_tuple</span><span class="p">())</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ipod.phobos.AvailableUpdates" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">AvailableUpdates</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">AvailableUpdates</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">recovery_software</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AvailableRecoverySoftware</span><span class="p">],</span> <span class="n">software_updates</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AvailableSoftwareUpdate</span><span class="p">])</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Container for a bunch of available updates and recovery software for iPods.</p>
+
+          
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ipod.phobos.AvailableUpdates.recovery_software" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">recovery_software</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">recovery_software</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AvailableRecoverySoftware</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Set of available recovery software</p>
+
+          
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ipod.phobos.AvailableUpdates.software_updates" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">software_updates</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">software_updates</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AvailableSoftwareUpdate</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Set of available software updates</p>
+
+          
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.AvailableUpdates.extend_with" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">extend_with</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">extend_with</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n">AvailableUpdates</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Extend this object with data from another AvailableUpdates object.</p>
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">extend_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">AvailableUpdates</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Extend this object with data from another AvailableUpdates object.&quot;&quot;&quot;</span>
+	<span class="bp">self</span><span class="o">.</span><span class="n">recovery_software</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">recovery_software</span><span class="p">)</span>
+	<span class="bp">self</span><span class="o">.</span><span class="n">software_updates</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">software_updates</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.AvailableUpdates.from_phobos_plist" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">from_phobos_plist</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_phobos_plist</span><span class="p">(</span><span class="n">plist_data</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bytes</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fix_urls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Constructs an AvailableUpdates instance from Apple Phobos data in plist format</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+<h4 id="ipod.phobos.AvailableUpdates.from_phobos_plist(plist_data)" class="doc doc-heading doc-heading-parameter">              <b><code>plist_data</code></b>
+</h4>              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#bytes">bytes</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>Phobos data in plist format</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+<h4 id="ipod.phobos.AvailableUpdates.from_phobos_plist(fix_urls)" class="doc doc-heading doc-heading-parameter">              <b><code>fix_urls</code></b>
+</h4>              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>, default:
+                  <code>True</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Whether to modify all URLs, placing them all in the <code>https</code> scheme</p>
+          </div>
+        </li>
+    </ul>
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_phobos_plist</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">plist_data</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bytes</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fix_urls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Constructs an AvailableUpdates instance from Apple Phobos data in plist format</span>
+
+<span class="sd">	Parameters:</span>
+<span class="sd">		plist_data: Phobos data in plist format</span>
+<span class="sd">		fix_urls: Whether to modify all URLs, placing them all in the `https` scheme</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">data</span> <span class="o">=</span> <span class="n">plistlib</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">plist_data</span><span class="p">)</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_fix_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">fix_urls</span><span class="p">:</span>
+			<span class="k">return</span> <span class="n">fix_appldnld_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">return</span> <span class="n">url</span>
+
+	<span class="n">recovery_software</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AvailableRecoverySoftware</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+	<span class="n">seen_firmware_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+	<span class="k">for</span> <span class="n">by_version_data</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;MobileDeviceSoftwareVersionsByVersion&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+		<span class="n">versions_data</span> <span class="o">=</span> <span class="n">by_version_data</span><span class="p">[</span><span class="s2">&quot;RecoverySoftwareVersions&quot;</span><span class="p">]</span>
+		<span class="c1"># print(versions_data)</span>
+		<span class="k">for</span> <span class="n">firmware_data_list</span> <span class="ow">in</span> <span class="p">(</span>
+			<span class="n">versions_data</span><span class="p">[</span><span class="s2">&quot;WTF&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;WTF&quot;</span> <span class="ow">in</span> <span class="n">versions_data</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+			<span class="n">versions_data</span><span class="p">[</span><span class="s2">&quot;Firmware&quot;</span><span class="p">][</span><span class="s2">&quot;DFU&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;Firmware&quot;</span> <span class="ow">in</span> <span class="n">versions_data</span> <span class="k">else</span> <span class="kc">None</span>
+		<span class="p">):</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">firmware_data_list</span><span class="p">:</span>
+				<span class="k">continue</span>
+			<span class="k">for</span> <span class="n">firmware_id</span><span class="p">,</span> <span class="n">firmware_data</span> <span class="ow">in</span> <span class="n">firmware_data_list</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+				<span class="n">firmware_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">firmware_id</span><span class="p">)</span>
+				<span class="k">if</span> <span class="n">firmware_id</span> <span class="ow">in</span> <span class="n">seen_firmware_ids</span><span class="p">:</span>
+					<span class="k">continue</span>
+				<span class="n">seen_firmware_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">firmware_id</span><span class="p">)</span>
+
+				<span class="n">usb_pid</span> <span class="o">=</span> <span class="n">firmware_id</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span>
+				<span class="k">if</span> <span class="n">usb_pid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">USB_PID_INDEX</span><span class="p">:</span>
+					<span class="c1"># then we dont support this iPod, so ignore it</span>
+					<span class="k">continue</span>
+
+				<span class="n">recovery_software</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">AvailableRecoverySoftware</span><span class="p">(</span>
+					<span class="n">usb_pid</span><span class="o">=</span><span class="n">usb_pid</span><span class="p">,</span>
+					<span class="n">build_version</span><span class="o">=</span><span class="n">firmware_data</span><span class="p">[</span><span class="s2">&quot;BuildVersion&quot;</span><span class="p">],</span>
+					<span class="n">firmware_url</span><span class="o">=</span><span class="n">_fix_url</span><span class="p">(</span><span class="n">firmware_data</span><span class="p">[</span><span class="s2">&quot;FirmwareURL&quot;</span><span class="p">])</span>
+				<span class="p">))</span>
+
+	<span class="n">software_updates</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AvailableSoftwareUpdate</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+		<span class="n">AvailableSoftwareUpdate</span><span class="p">(</span>
+			<span class="n">updater_family_id</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;UpdaterFamilyID&quot;</span><span class="p">]),</span>
+			<span class="n">build_id</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;BuildID&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="s2">&quot;BuildID&quot;</span> <span class="ow">in</span> <span class="n">item</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+			<span class="n">firmware_url</span><span class="o">=</span><span class="n">_fix_url</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;FirmwareURL&quot;</span><span class="p">]),</span>
+			<span class="n">documentation_url</span><span class="o">=</span><span class="n">_fix_url</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;DocumentationURL&quot;</span><span class="p">]),</span>
+			<span class="n">visible_build_id</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;VisibleBuildID&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="s2">&quot;VisibleBuildID&quot;</span> <span class="ow">in</span> <span class="n">item</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+			<span class="n">product_version</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ProductVersion&quot;</span><span class="p">),</span>
+			<span class="n">build_version</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;BuildVersion&quot;</span><span class="p">)</span>
+		<span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;iPodSoftwareVersions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+	<span class="p">}</span>
+	<span class="n">software_updates</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">update</span> <span class="k">for</span> <span class="n">update</span> <span class="ow">in</span> <span class="n">software_updates</span> <span class="k">if</span> <span class="n">update</span><span class="o">.</span><span class="n">get_target_device</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+
+	<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+		<span class="n">software_updates</span><span class="o">=</span><span class="n">software_updates</span><span class="p">,</span>
+		<span class="n">recovery_software</span><span class="o">=</span><span class="n">recovery_software</span>
+	<span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.AvailableUpdates.recovery_software_by_usb_pid" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">recovery_software_by_usb_pid</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">recovery_software_by_usb_pid</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">AvailableRecoverySoftware</span><span class="p">]]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return a mapping of USB product IDs to available recovery software.</p>
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">recovery_software_by_usb_pid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">AvailableRecoverySoftware</span><span class="p">]]:</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Return a mapping of USB product IDs to available recovery software.&quot;&quot;&quot;</span>
+	<span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+
+	<span class="k">for</span> <span class="n">update</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recovery_software</span><span class="p">:</span>
+		<span class="n">key</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">usb_pid</span>
+		<span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">continue</span>
+		<span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+			<span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="n">update_list</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+		<span class="n">update_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+	<span class="k">return</span> <span class="n">result</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ipod.phobos.AvailableUpdates.software_updates_by_updater_family_id" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">software_updates_by_updater_family_id</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">software_updates_by_updater_family_id</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">AvailableSoftwareUpdate</span><span class="p">]]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return a mapping of updater family IDs to available software updates.</p>
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">software_updates_by_updater_family_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">AvailableSoftwareUpdate</span><span class="p">]]:</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Return a mapping of updater family IDs to available software updates.&quot;&quot;&quot;</span>
+	<span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+
+	<span class="k">for</span> <span class="n">update</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">software_updates</span><span class="p">:</span>
+		<span class="n">key</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">updater_family_id</span>
+		<span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">continue</span>
+		<span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+			<span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="n">update_list</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+		<span class="n">update_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+	<span class="k">return</span> <span class="n">result</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ipod.phobos.fix_appldnld_url" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">fix_appldnld_url</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">fix_appldnld_url</span><span class="p">(</span><span class="n">phobos_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Fix an appldnld CDN URL by updating its host and changing the scheme to <code>https</code>.</p>
+
+          
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ipod/phobos.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fix_appldnld_url</span><span class="p">(</span><span class="n">phobos_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Fix an appldnld CDN URL by updating its host and changing the scheme to `https`.&quot;&quot;&quot;</span>
+	<span class="n">url</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">phobos_url</span><span class="p">)</span>
+
+	<span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">hostname</span> <span class="o">==</span> <span class="n">_EDGESUITE_DNLD_HOST</span><span class="p">:</span>
+		<span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">:])</span>
+	<span class="k">elif</span> <span class="n">url</span><span class="o">.</span><span class="n">hostname</span> <span class="ow">in</span> <span class="p">{</span><span class="n">_HTTP_DNLD_HOST</span><span class="p">,</span> <span class="n">_HTTPS_DNLD_HOST</span><span class="p">}:</span>
+		<span class="n">path</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">path</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid URL&quot;</span><span class="p">)</span>
+
+	<span class="k">return</span> <span class="n">urlunsplit</span><span class="p">((</span>
+		<span class="s2">&quot;https&quot;</span><span class="p">,</span> <span class="n">_HTTPS_DNLD_HOST</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">fragment</span>
+	<span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

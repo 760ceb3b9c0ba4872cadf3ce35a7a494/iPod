@@ -69,3 +69,4 @@ plugins:
 
 markdown_extensions:
   - pymdownx.magiclink
+  - pymdownx.snippets

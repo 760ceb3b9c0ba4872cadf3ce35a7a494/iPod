@@ -103,3 +103,70 @@ def macOS_get_mount_point(serial_number: str):
 def numeric_build_id_to_string(build_id: int):
 	"""Convert a numeric build ID to a string"""
 	return f"{build_id >> 24 & 0b1111}.{build_id >> 20 & 0b1111}.{build_id >> 16 & 0b1111}"
+
+
+def read_null_terminated_string(stream: BinaryIO, encoding: str = "utf-8"):
+	out = bytearray()
+	while True:
+		char = stream.read(1)[0]
+		if char == 0:
+			break
+		out.append(char)
+	return out.decode(encoding)
+
+
+def pixel_from565(pixel: int) -> tuple[int, int, int]:
+	return (
+		int((pixel >> 11 & 0b11111) * (255 / 0b11111)),
+		int((pixel >> 5 & 0b111111) * (255 / 0b111111)),
+		int((pixel & 0b11111) * (255 / 0b11111))
+	)
+
+
+def pixel_to565(pixel: tuple[int, int, int]) -> int:
+	return (
+		((
+			(int(0b11111 * (int(pixel[0]) / 255)) << 6) +
+			(int(0b111111 * (int(pixel[1]) / 255)))
+		) << 5) +
+		(int(0b11111 * (int(pixel[2]) / 255)))
+	)
+
+
+def pixels_from565(stream: BinaryIO, length: int) -> list[tuple[int, int, int]]:
+	pixels_list = []
+
+	for index in range(length // 2):
+		pixel = int.from_bytes(stream.read(2), "little")
+		pixels_list.append(pixel_from565(pixel))
+
+	return pixels_list
+
+
+def pixels_from565_bytes(stream: bytes, length: int) -> list[tuple[int, int, int]]:
+	pixels_list = []
+
+	for index in range(length // 2):
+		pixel = int.from_bytes(stream[(index*2):(index*2+2)], "little")
+		pixels_list.append(pixel_from565(pixel))
+
+	return pixels_list
+
+
+def pixel_toBGRA(pixel: tuple[int, int, int, int]) -> bytes:
+	return bytes([
+		pixel[2],
+		pixel[1],
+		pixel[0],
+		pixel[3]
+	])
+
+
+def pixel_fromBGRA(stream: BinaryIO) -> tuple[int, int, int, int]:
+	color = stream.read(4)
+	return (
+		color[2],
+		color[1],
+		color[0],
+		color[3]
+	)
